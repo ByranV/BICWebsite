@@ -5,9 +5,12 @@
   // Enquiry forms. Submissions are POSTed as JSON to `formEndpoint` (contact.php),
   // which emails them to the college from the web server. If `formEndpoint` is
   // emptied, forms fall back to opening the visitor's email app addressed to `formEmail`.
+  // `recaptchaSiteKey` is the public reCAPTCHA v3 key; contact.php checks the token
+  // with the matching secret key (kept in mail-config.php on the server).
   var CONFIG = {
     formEmail: 'info@bicollege.co.za',
-    formEndpoint: 'contact.php'
+    formEndpoint: 'contact.php',
+    recaptchaSiteKey: '6LdlrqkrAAAAAGDZ3wLwBGtIAlNd1lU0ofqpmdgk'
   };
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -29,8 +32,27 @@
       list.scrollLeft = activeTab.offsetLeft - list.offsetLeft - 16;
     }
 
-    document.querySelectorAll('.bic-form').forEach(initForm);
+    var forms = document.querySelectorAll('.bic-form');
+    if (forms.length && CONFIG.formEndpoint && CONFIG.recaptchaSiteKey) {
+      var s = document.createElement('script');
+      s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(CONFIG.recaptchaSiteKey);
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    forms.forEach(initForm);
   });
+
+  // Resolve with a reCAPTCHA v3 token, or '' if reCAPTCHA isn't configured or didn't load
+  // (contact.php then rejects the submission and the visitor sees the email fallback message).
+  function recaptchaToken() {
+    return new Promise(function (resolve) {
+      if (!CONFIG.recaptchaSiteKey || !window.grecaptcha) { resolve(''); return; }
+      grecaptcha.ready(function () {
+        grecaptcha.execute(CONFIG.recaptchaSiteKey, { action: 'contact' })
+          .then(resolve, function () { resolve(''); });
+      });
+    });
+  }
 
   function initForm(form) {
     var status = form.querySelector('.bic-form-status');
@@ -71,10 +93,13 @@
       // contact.php builds the email subject from the selected campus;
       // data-subject is only used by the mailto fallback below.
       if (CONFIG.formEndpoint) {
-        fetch(CONFIG.formEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(data)
+        recaptchaToken().then(function (token) {
+          data._recaptcha = token;
+          return fetch(CONFIG.formEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(data)
+          });
         }).then(function (r) {
           if (!r.ok) { throw new Error(r.status); }
           form.reset();

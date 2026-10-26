@@ -90,6 +90,22 @@ function smtp_send(array $cfg, string $from, array $recipients, string $message)
     }
 }
 
+// Ask Google whether a reCAPTCHA v3 token is genuine. Returns the decoded reply, or null
+// if Google couldn't be reached.
+function recaptcha_verify(string $secret, string $token, string $ip): ?array
+{
+    $post = http_build_query(['secret' => $secret, 'response' => $token, 'remoteip' => $ip]);
+    $ctx = stream_context_create(['http' => [
+        'method'  => 'POST',
+        'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
+        'content' => $post,
+        'timeout' => 10,
+    ]]);
+    $reply = @file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $ctx);
+    $json = $reply === false ? null : json_decode($reply, true);
+    return is_array($json) ? $json : null;
+}
+
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     header('Allow: POST');
     respond(405, ['ok' => false, 'error' => 'Method not allowed']);
@@ -113,8 +129,29 @@ if (!empty($data['_hp'])) {
     respond(200, ['ok' => true]);
 }
 
-// Simple per-IP rate limit (best effort; skipped if the temp folder isn't writable).
+$smtp = @include __DIR__ . '/mail-config.php';
+if (!is_array($smtp)) {
+    error_log('contact.php: mail-config.php is missing or invalid');
+    respond(500, ['ok' => false, 'error' => 'Mail could not be sent']);
+}
+
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+// reCAPTCHA v3: the page sends a token in `_recaptcha`; reject likely bots.
+// Skipped only if no secret key is configured in mail-config.php.
+if (!empty($smtp['recaptcha_secret'])) {
+    $token = is_string($data['_recaptcha'] ?? null) ? $data['_recaptcha'] : '';
+    $check = $token === '' ? null : recaptcha_verify($smtp['recaptcha_secret'], $token, $ip);
+    $minScore = (float) ($smtp['recaptcha_min_score'] ?? 0.5);
+    if (!$check || empty($check['success'])
+        || ($check['action'] ?? '') !== 'contact'
+        || (float) ($check['score'] ?? 0) < $minScore) {
+        error_log('contact.php: reCAPTCHA rejected: ' . ($check ? json_encode($check) : ($token === '' ? 'no token' : 'verify request failed')));
+        respond(403, ['ok' => false, 'error' => 'Spam check failed']);
+    }
+}
+
+// Simple per-IP rate limit (best effort; skipped if the temp folder isn't writable).
 $rateFile = sys_get_temp_dir() . '/bic_contact_' . md5($ip);
 $now = time();
 $hits = [];
@@ -189,11 +226,6 @@ $body = "Good day BIC Website Contact\n\n"
     . "\nIP: " . $ip
     . "\nTime: " . date('Y-m-d H:i:s T');
 
-$smtp = @include __DIR__ . '/mail-config.php';
-if (!is_array($smtp)) {
-    error_log('contact.php: mail-config.php is missing or invalid');
-    respond(500, ['ok' => false, 'error' => 'Mail could not be sent']);
-}
 $from = $smtp['username'];
 
 $headers = [
