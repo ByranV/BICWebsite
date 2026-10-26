@@ -2,12 +2,12 @@
 (function () {
   'use strict';
 
-  // Enquiry forms. By default a submitted form opens the visitor's email app with the
-  // message addressed to `formEmail`. To have forms sent silently instead, set
-  // `formEndpoint` to the URL of a form handler that accepts a JSON POST.
+  // Enquiry forms. Submissions are POSTed as JSON to `formEndpoint` (contact.php),
+  // which emails them to the college from the web server. If `formEndpoint` is
+  // emptied, forms fall back to opening the visitor's email app addressed to `formEmail`.
   var CONFIG = {
     formEmail: 'info@bicollege.co.za',
-    formEndpoint: ''
+    formEndpoint: 'contact.php'
   };
 
   document.addEventListener('DOMContentLoaded', function () {

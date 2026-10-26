@@ -302,3 +302,6 @@ a.bic-campus.card { display: block; border-radius: var(--radius); overflow: hidd
 .bic-tabs ul::-webkit-scrollbar { display: none; }
 
 .bic-form + .bic-rich { margin-top: 1rem; }
+
+/* spam honeypot on enquiry forms: hidden from people, visible to bots */
+.bic-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

@@ -1,0 +1,140 @@
+<?php
+/**
+ * Enquiry form handler for the website's "Contact me" / interview forms.
+ *
+ * Receives the JSON POST sent by assets/js/site.js (CONFIG.formEndpoint) and
+ * emails it from the hosting server using PHP's built-in mail() function.
+ *
+ * The recipient is fixed here on the server and is never taken from the
+ * browser, so this script can't be used to send mail to arbitrary addresses.
+ */
+
+// ---- Settings ---------------------------------------------------------------
+const MAIL_TO   = 'systemssupport@bicollege.co.za'; // where enquiries are delivered
+const MAIL_CC   = 'website@bicollege.co.za';     // copied on every enquiry ('' for none)
+const MAIL_FROM = 'info@bicollege.co.za';        // must be a mailbox on a domain hosted on this account
+const FROM_NAME = 'BIC Website';
+const RATE_MAX    = 5;                            // max submissions per visitor IP...
+const RATE_WINDOW = 600;                          // ...within this many seconds
+// -----------------------------------------------------------------------------
+
+date_default_timezone_set('Africa/Johannesburg');
+
+header('Content-Type: application/json; charset=utf-8');
+header('X-Content-Type-Options: nosniff');
+
+function respond(int $code, array $body): void
+{
+    http_response_code($code);
+    echo json_encode($body);
+    exit;
+}
+
+// Strip CR/LF and other control characters (blocks email header injection).
+function one_line(string $s): string
+{
+    return trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $s) ?? '');
+}
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    header('Allow: POST');
+    respond(405, ['ok' => false, 'error' => 'Method not allowed']);
+}
+
+// Only accept posts from this site's own pages.
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$originHost = parse_url($origin, PHP_URL_HOST) . (parse_url($origin, PHP_URL_PORT) ? ':' . parse_url($origin, PHP_URL_PORT) : '');
+if ($origin !== '' && strcasecmp($originHost, $_SERVER['HTTP_HOST'] ?? '') !== 0) {
+    respond(403, ['ok' => false, 'error' => 'Forbidden']);
+}
+
+$raw = file_get_contents('php://input', false, null, 0, 20000);
+$data = json_decode($raw ?: '', true);
+if (!is_array($data) || count($data) > 30) {
+    respond(400, ['ok' => false, 'error' => 'Invalid request']);
+}
+
+// Honeypot: real visitors never see or fill this field. Pretend success to bots.
+if (!empty($data['_hp'])) {
+    respond(200, ['ok' => true]);
+}
+
+// Simple per-IP rate limit (best effort; skipped if the temp folder isn't writable).
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$rateFile = sys_get_temp_dir() . '/bic_contact_' . md5($ip);
+$now = time();
+$hits = [];
+if (is_readable($rateFile)) {
+    $hits = array_filter(
+        array_map('intval', explode(',', (string) file_get_contents($rateFile))),
+        fn ($t) => $t > $now - RATE_WINDOW
+    );
+}
+if (count($hits) >= RATE_MAX) {
+    respond(429, ['ok' => false, 'error' => 'Too many submissions. Please try again later.']);
+}
+$hits[] = $now;
+@file_put_contents($rateFile, implode(',', $hits), LOCK_EX);
+
+// Build the message body and find the visitor's email address.
+$subject = one_line((string) ($data['_subject'] ?? ''));
+$subject = mb_substr($subject !== '' ? $subject : 'Website enquiry', 0, 150);
+$replyTo = '';
+$lines = [];
+
+foreach ($data as $key => $value) {
+    if (!is_string($key) || $key === '' || $key[0] === '_' || !is_scalar($value)) {
+        continue;
+    }
+    $label = mb_substr(one_line($key), 0, 60);
+    $value = mb_substr(trim(str_replace("\r", '', (string) $value)), 0, 5000);
+    if ($value === '') {
+        continue;
+    }
+    if ($replyTo === '' && stripos($label, 'email') !== false
+        && filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        $replyTo = $value;
+    }
+    $lines[] = strpos($value, "\n") !== false
+        ? $label . ":\n" . $value
+        : $label . ': ' . $value;
+}
+
+if (!$lines) {
+    respond(400, ['ok' => false, 'error' => 'Empty message']);
+}
+
+$body = implode("\n\n", $lines)
+    . "\n\n--\nSent from the website enquiry form"
+    . "\nPage: " . one_line($_SERVER['HTTP_REFERER'] ?? 'unknown')
+    . "\nIP: " . $ip
+    . "\nTime: " . date('Y-m-d H:i:s T');
+
+$headers = [
+    'From'                      => mb_encode_mimeheader(FROM_NAME) . ' <' . MAIL_FROM . '>',
+    'MIME-Version'              => '1.0',
+    'Content-Type'              => 'text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding' => '8bit',
+    'X-Mailer'                  => 'BIC website',
+];
+if (MAIL_CC !== '') {
+    $headers['Cc'] = MAIL_CC;
+}
+if ($replyTo !== '') {
+    $headers['Reply-To'] = $replyTo; // "Reply" in your mail app goes to the visitor
+}
+
+$sent = mail(
+    MAIL_TO,
+    mb_encode_mimeheader($subject, 'UTF-8'),
+    $body,
+    $headers,
+    '-f' . MAIL_FROM // envelope sender, helps delivery and bounce handling
+);
+
+if (!$sent) {
+    error_log('contact.php: mail() failed for subject "' . $subject . '"');
+    respond(500, ['ok' => false, 'error' => 'Mail could not be sent']);
+}
+
+respond(200, ['ok' => true]);
