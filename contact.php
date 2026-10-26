@@ -3,7 +3,8 @@
  * Enquiry form handler for the website's "Contact me" / interview forms.
  *
  * Receives the JSON POST sent by assets/js/site.js (CONFIG.formEndpoint) and
- * emails it from the hosting server using PHP's built-in mail() function.
+ * emails it by logging in to the hosting server's mailbox over SMTP. The
+ * mailbox credentials live in mail-config.php (not committed to git).
  *
  * The recipient is fixed here on the server and is never taken from the
  * browser, so this script can't be used to send mail to arbitrary addresses.
@@ -12,8 +13,7 @@
 // ---- Settings ---------------------------------------------------------------
 const MAIL_TO   = 'systemssupport@bicollege.co.za'; // where enquiries are delivered
 const MAIL_CC   = 'website@bicollege.co.za';     // copied on every enquiry ('' for none)
-const MAIL_FROM = 'info@bicollege.co.za';        // must be a mailbox on a domain hosted on this account
-const FROM_NAME = 'BIC Website';
+const FROM_NAME = 'BIC Website';                 // mail is sent from the SMTP mailbox in mail-config.php
 const RATE_MAX    = 5;                            // max submissions per visitor IP...
 const RATE_WINDOW = 600;                          // ...within this many seconds
 // -----------------------------------------------------------------------------
@@ -34,6 +34,60 @@ function respond(int $code, array $body): void
 function one_line(string $s): string
 {
     return trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $s) ?? '');
+}
+
+// Send a prepared message through an SMTP server over implicit TLS (port 465)
+// with AUTH LOGIN. Throws RuntimeException on any failure.
+function smtp_send(array $cfg, string $from, array $recipients, string $message): void
+{
+    $host = $cfg['host'];
+    $ctx = stream_context_create(['ssl' => [
+        'peer_name'        => $host,
+        'verify_peer'      => $cfg['verify_peer'] ?? true,
+        'verify_peer_name' => $cfg['verify_peer'] ?? true,
+    ]]);
+    $fp = @stream_socket_client("ssl://$host:{$cfg['port']}", $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $ctx);
+    if (!$fp) {
+        throw new RuntimeException("connect failed: $errstr ($errno)");
+    }
+    stream_set_timeout($fp, 15);
+
+    // Send a command (unless null) and check the reply code; replies may span several lines.
+    $cmd = function (?string $line, array $expect, string $logAs = '') use ($fp): void {
+        if ($line !== null) {
+            fwrite($fp, $line . "\r\n");
+        }
+        $reply = '';
+        while (($l = fgets($fp, 1024)) !== false) {
+            $reply .= $l;
+            if (strlen($l) < 4 || $l[3] === ' ') {
+                break;
+            }
+        }
+        if (!in_array((int) substr($reply, 0, 3), $expect, true)) {
+            throw new RuntimeException(($logAs ?: (string) $line) . ' -> ' . trim($reply));
+        }
+    };
+
+    try {
+        $cmd(null, [220]);
+        $cmd('EHLO ' . one_line($_SERVER['SERVER_NAME'] ?? 'localhost'), [250]);
+        $cmd('AUTH LOGIN', [334]);
+        $cmd(base64_encode($cfg['username']), [334], 'AUTH username');
+        $cmd(base64_encode($cfg['password']), [235], 'AUTH password');
+        $cmd("MAIL FROM:<$from>", [250]);
+        foreach ($recipients as $rcpt) {
+            $cmd("RCPT TO:<$rcpt>", [250, 251]);
+        }
+        $cmd('DATA', [354]);
+        // Normalise line endings and dot-stuff lines that start with ".".
+        $message = preg_replace('/\r?\n/', "\r\n", $message);
+        $message = preg_replace('/^\./m', '..', $message);
+        $cmd($message . "\r\n.", [250], 'DATA body');
+        $cmd('QUIT', [221]);
+    } finally {
+        fclose($fp);
+    }
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -76,10 +130,10 @@ if (count($hits) >= RATE_MAX) {
 $hits[] = $now;
 @file_put_contents($rateFile, implode(',', $hits), LOCK_EX);
 
-// Build the message body and find the visitor's email address.
-$subject = one_line((string) ($data['_subject'] ?? ''));
-$subject = mb_substr($subject !== '' ? $subject : 'Website enquiry', 0, 150);
+// Build the message body and find the visitor's email address and campus.
 $replyTo = '';
+$campus = '';
+$name = '';
 $lines = [];
 
 foreach ($data as $key => $value) {
@@ -95,6 +149,12 @@ foreach ($data as $key => $value) {
         && filter_var($value, FILTER_VALIDATE_EMAIL)) {
         $replyTo = $value;
     }
+    if ($campus === '' && stripos($label, 'campus') !== false) {
+        $campus = one_line($value); // the form's campus dropdown (or hidden campus field)
+    }
+    if ($name === '' && in_array(strtolower($label), ['name', 'parent first name'], true)) {
+        $name = $value;
+    }
     $lines[] = strpos($value, "\n") !== false
         ? $label . ":\n" . $value
         : $label . ': ' . $value;
@@ -103,15 +163,45 @@ foreach ($data as $key => $value) {
 if (!$lines) {
     respond(400, ['ok' => false, 'error' => 'Empty message']);
 }
+if ($name === '') {
+    respond(400, ['ok' => false, 'error' => 'Please enter your name']);
+}
 
-$body = implode("\n\n", $lines)
+// "Bryanston Campus" -> subject "Bryanston College Website Enquiry",
+// greeting "...website enquiry for Bryanston campus below".
+$campus = mb_substr($campus, 0, 60);
+if (preg_match('/^(.+?)\s+campus$/i', $campus, $m)) {
+    $subject = $m[1] . ' College Website Enquiry';
+    $forWhom = $m[1] . ' campus';
+} elseif ($campus !== '') {
+    $subject = $campus . ' Website Enquiry'; // e.g. "Preparatory School"
+    $forWhom = $campus;
+} else {
+    $subject = 'BIC Website Enquiry';
+    $forWhom = 'BIC';
+}
+
+$body = "Good day BIC Website Contact\n\n"
+    . "Please see website enquiry for $forWhom below.\n\n"
+    . implode("\n\n", $lines)
     . "\n\n--\nSent from the website enquiry form"
     . "\nPage: " . one_line($_SERVER['HTTP_REFERER'] ?? 'unknown')
     . "\nIP: " . $ip
     . "\nTime: " . date('Y-m-d H:i:s T');
 
+$smtp = @include __DIR__ . '/mail-config.php';
+if (!is_array($smtp)) {
+    error_log('contact.php: mail-config.php is missing or invalid');
+    respond(500, ['ok' => false, 'error' => 'Mail could not be sent']);
+}
+$from = $smtp['username'];
+
 $headers = [
-    'From'                      => mb_encode_mimeheader(FROM_NAME) . ' <' . MAIL_FROM . '>',
+    'Date'                      => date('r'),
+    'From'                      => mb_encode_mimeheader(FROM_NAME) . ' <' . $from . '>',
+    'To'                        => MAIL_TO,
+    'Subject'                   => mb_encode_mimeheader($subject, 'UTF-8'),
+    'Message-ID'                => '<' . bin2hex(random_bytes(12)) . '@' . substr(strrchr($from, '@'), 1) . '>',
     'MIME-Version'              => '1.0',
     'Content-Type'              => 'text/plain; charset=UTF-8',
     'Content-Transfer-Encoding' => '8bit',
@@ -124,16 +214,18 @@ if ($replyTo !== '') {
     $headers['Reply-To'] = $replyTo; // "Reply" in your mail app goes to the visitor
 }
 
-$sent = mail(
-    MAIL_TO,
-    mb_encode_mimeheader($subject, 'UTF-8'),
-    $body,
-    $headers,
-    '-f' . MAIL_FROM // envelope sender, helps delivery and bounce handling
-);
+$message = '';
+foreach ($headers as $name => $value) {
+    $message .= "$name: $value\r\n";
+}
+$message .= "\r\n" . $body;
 
-if (!$sent) {
-    error_log('contact.php: mail() failed for subject "' . $subject . '"');
+$recipients = array_filter([MAIL_TO, MAIL_CC]);
+
+try {
+    smtp_send($smtp, $from, $recipients, $message);
+} catch (RuntimeException $e) {
+    error_log('contact.php: SMTP send failed for subject "' . $subject . '": ' . $e->getMessage());
     respond(500, ['ok' => false, 'error' => 'Mail could not be sent']);
 }
 

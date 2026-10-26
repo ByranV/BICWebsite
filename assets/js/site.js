@@ -68,8 +68,9 @@
 
       var subject = form.getAttribute('data-subject') || 'Website enquiry';
 
+      // contact.php builds the email subject from the selected campus;
+      // data-subject is only used by the mailto fallback below.
       if (CONFIG.formEndpoint) {
-        data._subject = subject;
         fetch(CONFIG.formEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
