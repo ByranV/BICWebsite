@@ -134,7 +134,6 @@ nav .bic-sub li.parent a { font-weight: 500; }
 
 /* ---------- Content ---------- */
 .bic-content { padding: 32px 0 64px; }
-.bic-narrow .container { max-width: 940px; }
 .bic-section + .bic-section { margin-top: 24px; }
 .bic-paper { background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 38px); }
 .bic-paper > :first-child, .bic-rich > :first-child { margin-top: 0; }
