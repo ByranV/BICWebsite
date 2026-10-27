@@ -9,7 +9,8 @@
   // with the matching secret key (kept in mail-config.php on the server).
   var CONFIG = {
     formEmail: 'info@bicollege.co.za',
-    formEndpoint: 'contact.php',
+    // resolved from this script's URL so forms work on pages in subfolders too
+    formEndpoint: new URL('../../contact.php', document.currentScript.src).href,
     recaptchaSiteKey: '6LdlrqkrAAAAAGDZ3wLwBGtIAlNd1lU0ofqpmdgk'
   };
 

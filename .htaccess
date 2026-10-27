@@ -19,10 +19,28 @@ RewriteCond %{THE_REQUEST} \s/index\.html[\s?]
 RewriteRule ^index\.html$ / [R=301,L]
 
 # Old WordPress pages that no longer exist or were renamed
-RewriteRule ^(calendar|calendar-2|calendar-pta|2025-2)/?$ /calendar-2027.html [R=301,L]
+RewriteRule ^(calendar|calendar-2|calendar-pta|2025-2)/?$ /Bryanston/calendar-2027.html [R=301,L]
+
+# Bryanston Campus pages moved into /Bryanston/
+RewriteRule ^(bryanston-campus|subjects-offered-2|applications|request-an-interview|fees|exam-entry|student-life|2026-provisional|calendar-2027|eresources|results)(/|\.html)?$ /Bryanston/$1.html [R=301,L]
+
+# Pretoria Campus pages moved into /Pretoria/
+RewriteRule ^(pretoria-campus|subjects-offered-pta|request-an-interview-2|eresources-2)(/|\.html)?$ /Pretoria/$1.html [R=301,L]
+
+# Distance Campus pages moved into /Distance/
+RewriteRule ^(distance-campus|about-distance-college|subjects-offered|course-fees|online-registration|examination-entry|accredited-study-center|eresources-4|results-2)(/|\.html)?$ /Distance/$1.html [R=301,L]
+
+# Examinations pages moved into /Examinations/
+RewriteRule ^(examinations|bryanston-za057|pretoria-za188|distance-za559|keytime|access-arrangements|admission-to-institutions|private-candidates|entry-process|code-of-conduct-2|admission-sa|admission-uk|admissions-usa|admissions-worldwide)(/|\.html)?$ /Examinations/$1.html [R=301,L]
+
+# Bare section folders -> the section's home page
+RewriteRule ^Bryanston/?$ /Bryanston/bryanston-campus.html [R=301,L]
+RewriteRule ^Pretoria/?$ /Pretoria/pretoria-campus.html [R=301,L]
+RewriteRule ^Distance/?$ /Distance/distance-campus.html [R=301,L]
+RewriteRule ^Examinations/?$ /Examinations/examinations.html [R=301,L]
 RewriteRule ^stuart/?$ / [R=301,L]
-RewriteRule ^sibjects-offered-pta(/|\.html)?$ /subjects-offered-pta.html [R=301,L]
-RewriteRule ^elementor-1087(/|\.html)?$ /admissions-worldwide.html [R=301,L]
+RewriteRule ^sibjects-offered-pta(/|\.html)?$ /Pretoria/subjects-offered-pta.html [R=301,L]
+RewriteRule ^elementor-1087(/|\.html)?$ /Examinations/admissions-worldwide.html [R=301,L]
 
 # Old WordPress URLs: /about-us/ -> /about-us.html
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
