@@ -134,7 +134,6 @@ nav .bic-sub li.parent a { font-weight: 500; }
 
 /* ---------- Content ---------- */
 .bic-content { padding: 32px 0 64px; }
-.bic-narrow .container { max-width: 940px; }
 .bic-section + .bic-section { margin-top: 24px; }
 .bic-paper { background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 38px); }
 .bic-paper > :first-child, .bic-rich > :first-child { margin-top: 0; }
@@ -171,11 +170,30 @@ h6.bic-h + .bic-h { margin-top: 0; }
 .bic-table tr:last-child { border-bottom: 0; }
 .bic-table td:first-child { color: var(--ink); font-weight: 500; }
 
+/* Subjects offered grid: navy column heads, soft-blue section rows */
+.bic-subjects table { min-width: 600px; table-layout: fixed; }
+.bic-subjects th, .bic-subjects td { text-align: center; vertical-align: middle; }
+.bic-subjects thead th { background: var(--navy); color: #fff; font-size: 1.05rem; padding: 16px 18px; }
+.bic-subjects thead th + th { border-left: 1px solid rgba(255, 255, 255, .15); }
+.bic-subjects tbody th { background: var(--blue-soft); color: var(--navy); padding: 9px 18px; letter-spacing: .02em; }
+.bic-subjects td { padding: 10px 14px; }
+.bic-subjects td + td { border-left: 1px solid var(--line); }
+.bic-subjects td:first-child { color: inherit; font-weight: 400; }
+.bic-subjects td.bic-na { color: var(--muted); }
+.bic-subjects-narrow table { min-width: 420px; }
+
 .bic-figure { margin: 1.5rem auto; text-align: center; }
 .bic-figure img { border-radius: 10px; display: block; margin: 0 auto; }
 .bic-figure figcaption { font-size: .9rem; color: var(--muted); margin-top: 8px; }
 .bic-figure.bic-deco { margin: .5rem auto; }
 .bic-media .bic-figure { margin: 0 auto 1rem; }
+.bic-img-link { position: relative; display: block; border-radius: 10px; transition: transform .18s, box-shadow .18s; }
+.bic-img-link:hover, .bic-img-link:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(20, 35, 58, .10), 0 12px 28px rgba(20, 35, 58, .14); }
+/* Caption sits below the image without taking layout space; shown on hover/focus, always on touch screens */
+.bic-img-cta { position: absolute; top: 100%; left: 0; right: 0; margin-top: 12px; color: var(--blue); font-weight: 500; text-align: center; opacity: 0; transform: translateY(-4px); transition: opacity .18s, transform .18s; pointer-events: none; }
+.bic-img-cta::after { content: " \2192"; }
+.bic-img-link:hover .bic-img-cta, .bic-img-link:focus-visible .bic-img-cta { opacity: 1; transform: none; }
+@media (hover: none) { .bic-img-cta { position: static; display: block; opacity: 1; transform: none; } }
 
 .btn, .btn-large, .btn:focus, .btn-large:focus { background-color: var(--blue); border-radius: 999px; text-transform: none; font-weight: 500; letter-spacing: .01em; box-shadow: 0 2px 6px rgba(40, 114, 250, .3); }
 .btn:hover, .btn-large:hover { background-color: var(--blue-dark); }
@@ -244,8 +262,11 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-announce-icon i, .bic-feature-icon i { font-size: 28px; }
 .bic-features { display: flex; flex-wrap: wrap; margin: 0 -12px; }
 .bic-features > .col { padding: 0 12px; margin: 0 0 24px; display: flex; }
-.bic-feature { width: 100%; }
-.bic-feature .bic-h { margin-top: 18px; font-size: 1.4rem; }
+/* icon on the left; heading and text in a column beside it */
+.bic-feature { width: 100%; display: grid; grid-template-columns: 52px 1fr; column-gap: 20px; align-content: start; }
+.bic-feature .bic-feature-icon { grid-column: 1; grid-row: 1; }
+.bic-feature .bic-h { grid-column: 2; grid-row: 1; align-self: center; margin: 0; font-size: 1.4rem; }
+.bic-feature .bic-rich { grid-column: 2; margin-top: 14px; }
 .page-home .bic-band { background: #e6ecf4; margin-top: clamp(20px, 3vw, 36px); padding: clamp(32px, 5vw, 56px) 0; }
 .bic-campuses { margin: 0 -12px; display: flex; flex-wrap: wrap; }
 .bic-campuses > .col { padding: 0 12px; margin: 0; }
@@ -256,7 +277,11 @@ a.bic-campus.card { display: block; border-radius: var(--radius); overflow: hidd
 .bic-campus .card-content { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; }
 .bic-campus .card-title { font-size: 1.2rem; font-weight: 500; line-height: 1.3; margin: 0; }
 .bic-campus .card-content i { color: var(--blue-dark); }
-@media (max-width: 600px) { .bic-announce { flex-direction: column; gap: 14px; } }
+@media (max-width: 600px) {
+  .bic-announce { flex-direction: column; gap: 14px; }
+  .bic-feature { column-gap: 14px; }
+  .bic-feature .bic-rich { grid-column: 1 / -1; } /* phones: text uses the full card width below icon + heading */
+}
 
 /* ---------- Site map ---------- */
 .bic-sitemap h2.bic-h { font-size: 1.2rem; margin-top: 0; }
@@ -302,3 +327,6 @@ a.bic-campus.card { display: block; border-radius: var(--radius); overflow: hidd
 .bic-tabs ul::-webkit-scrollbar { display: none; }
 
 .bic-form + .bic-rich { margin-top: 1rem; }
+
+/* spam honeypot on enquiry forms: hidden from people, visible to bots */
+.bic-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

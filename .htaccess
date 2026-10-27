@@ -1,0 +1,48 @@
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+# Mailbox credentials for contact.php
+<Files "mail-config*.php">
+  Require all denied
+</Files>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# One canonical host: https://britishinternationalcollege.co.za
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://britishinternationalcollege.co.za%{REQUEST_URI} [R=301,L]
+
+# /index.html -> / (only on direct requests, not the DirectoryIndex lookup)
+RewriteCond %{THE_REQUEST} \s/index\.html[\s?]
+RewriteRule ^index\.html$ / [R=301,L]
+
+# Old WordPress pages that no longer exist or were renamed
+RewriteRule ^(calendar|calendar-2|calendar-pta|2025-2)/?$ /bryanston/calendar-2027.html [R=301,L]
+
+# Bryanston Campus pages moved into /bryanston/
+RewriteRule ^(bryanston-campus|subjects-offered-2|applications|request-an-interview|fees|exam-entry|student-life|2026-provisional|calendar-2027|eresources|results)(/|\.html)?$ /bryanston/$1.html [R=301,L]
+
+# Pretoria Campus pages moved into /pretoria/
+RewriteRule ^(pretoria-campus|subjects-offered-pta|request-an-interview-2|eresources-2)(/|\.html)?$ /pretoria/$1.html [R=301,L]
+
+# Distance Campus pages moved into /distance/
+RewriteRule ^(distance-campus|about-distance-college|subjects-offered|course-fees|online-registration|examination-entry|accredited-study-center|eresources-4|results-2)(/|\.html)?$ /distance/$1.html [R=301,L]
+
+# Examinations pages moved into /examinations/
+RewriteRule ^(examinations|bryanston-za057|pretoria-za188|distance-za559|keytime|access-arrangements|admission-to-institutions|private-candidates|entry-process|code-of-conduct-2|admission-sa|admission-uk|admissions-usa|admissions-worldwide)(/|\.html)?$ /examinations/$1.html [R=301,L]
+
+# Bare section folders -> the section's home page
+RewriteRule ^bryanston/?$ /bryanston/bryanston-campus.html [R=301,L]
+RewriteRule ^pretoria/?$ /pretoria/pretoria-campus.html [R=301,L]
+RewriteRule ^distance/?$ /distance/distance-campus.html [R=301,L]
+RewriteRule ^examinations/?$ /examinations/examinations.html [R=301,L]
+RewriteRule ^stuart/?$ / [R=301,L]
+RewriteRule ^sibjects-offered-pta(/|\.html)?$ /pretoria/subjects-offered-pta.html [R=301,L]
+RewriteRule ^elementor-1087(/|\.html)?$ /examinations/admissions-worldwide.html [R=301,L]
+
+# Old WordPress URLs: /about-us/ -> /about-us.html
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([a-z0-9-]+)/?$ /$1.html [R=301,L]
+</IfModule>
