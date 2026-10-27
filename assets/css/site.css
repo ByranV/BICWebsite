@@ -170,6 +170,17 @@ h6.bic-h + .bic-h { margin-top: 0; }
 .bic-table tr:last-child { border-bottom: 0; }
 .bic-table td:first-child { color: var(--ink); font-weight: 500; }
 
+/* Subjects offered grid: navy column heads, soft-blue section rows */
+.bic-subjects table { min-width: 600px; table-layout: fixed; }
+.bic-subjects th, .bic-subjects td { text-align: center; vertical-align: middle; }
+.bic-subjects thead th { background: var(--navy); color: #fff; font-size: 1.05rem; padding: 16px 18px; }
+.bic-subjects thead th + th { border-left: 1px solid rgba(255, 255, 255, .15); }
+.bic-subjects tbody th { background: var(--blue-soft); color: var(--navy); padding: 9px 18px; letter-spacing: .02em; }
+.bic-subjects td { padding: 10px 14px; }
+.bic-subjects td + td { border-left: 1px solid var(--line); }
+.bic-subjects td:first-child { color: inherit; font-weight: 400; }
+.bic-subjects td.bic-na { color: var(--muted); }
+
 .bic-figure { margin: 1.5rem auto; text-align: center; }
 .bic-figure img { border-radius: 10px; display: block; margin: 0 auto; }
 .bic-figure figcaption { font-size: .9rem; color: var(--muted); margin-top: 8px; }
