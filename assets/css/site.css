@@ -180,12 +180,20 @@ h6.bic-h + .bic-h { margin-top: 0; }
 .bic-subjects td + td { border-left: 1px solid var(--line); }
 .bic-subjects td:first-child { color: inherit; font-weight: 400; }
 .bic-subjects td.bic-na { color: var(--muted); }
+.bic-subjects-narrow table { min-width: 420px; }
 
 .bic-figure { margin: 1.5rem auto; text-align: center; }
 .bic-figure img { border-radius: 10px; display: block; margin: 0 auto; }
 .bic-figure figcaption { font-size: .9rem; color: var(--muted); margin-top: 8px; }
 .bic-figure.bic-deco { margin: .5rem auto; }
 .bic-media .bic-figure { margin: 0 auto 1rem; }
+.bic-img-link { position: relative; display: block; border-radius: 10px; transition: transform .18s, box-shadow .18s; }
+.bic-img-link:hover, .bic-img-link:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(20, 35, 58, .10), 0 12px 28px rgba(20, 35, 58, .14); }
+/* Caption sits below the image without taking layout space; shown on hover/focus, always on touch screens */
+.bic-img-cta { position: absolute; top: 100%; left: 0; right: 0; margin-top: 12px; color: var(--blue); font-weight: 500; text-align: center; opacity: 0; transform: translateY(-4px); transition: opacity .18s, transform .18s; pointer-events: none; }
+.bic-img-cta::after { content: " \2192"; }
+.bic-img-link:hover .bic-img-cta, .bic-img-link:focus-visible .bic-img-cta { opacity: 1; transform: none; }
+@media (hover: none) { .bic-img-cta { position: static; display: block; opacity: 1; transform: none; } }
 
 .btn, .btn-large, .btn:focus, .btn-large:focus { background-color: var(--blue); border-radius: 999px; text-transform: none; font-weight: 500; letter-spacing: .01em; box-shadow: 0 2px 6px rgba(40, 114, 250, .3); }
 .btn:hover, .btn-large:hover { background-color: var(--blue-dark); }
