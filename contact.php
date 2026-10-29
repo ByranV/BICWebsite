@@ -14,6 +14,19 @@
 const MAIL_TO   = 'systemssupport@bicollege.co.za'; // where enquiries are delivered
 const MAIL_CC   = 'website@bicollege.co.za';     // copied on every enquiry ('' for none)
 const FROM_NAME = 'BIC Website';                 // mail is sent from the SMTP mailbox in mail-config.php
+// "Contact us" forms for these campuses go to the listed addresses instead
+// (subject "Contact Me Request: <campus>"). Keys are lower-case campus names.
+const CONTACT_TO = [
+    'bryanston campus' => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
+    'pretoria campus'  => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
+    'distance campus'  => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'studentadvisor2@bidc.co.za'],
+];
+// "Request an Interview" forms for these campuses go to the listed addresses instead
+// (subject "<Bryanston> College Website - Request for Interview").
+const INTERVIEW_TO = [
+    'bryanston campus' => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
+    'pretoria campus'  => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
+];
 const RATE_MAX    = 5;                            // max submissions per visitor IP...
 const RATE_WINDOW = 600;                          // ...within this many seconds
 // -----------------------------------------------------------------------------
@@ -171,6 +184,8 @@ $hits[] = $now;
 $replyTo = '';
 $campus = '';
 $name = '';
+$isContactForm = false;   // "Contact us" forms have a "Name" field...
+$isInterviewForm = false; // ...interview forms use "Parent First Name"
 $lines = [];
 
 foreach ($data as $key => $value) {
@@ -191,6 +206,12 @@ foreach ($data as $key => $value) {
     }
     if ($name === '' && in_array(strtolower($label), ['name', 'parent first name'], true)) {
         $name = $value;
+    }
+    if (strtolower($label) === 'name') {
+        $isContactForm = true;
+    }
+    if (strtolower($label) === 'parent first name') {
+        $isInterviewForm = true;
     }
     $lines[] = strpos($value, "\n") !== false
         ? $label . ":\n" . $value
@@ -218,8 +239,25 @@ if (preg_match('/^(.+?)\s+campus$/i', $campus, $m)) {
     $forWhom = 'BIC';
 }
 
-$body = "Good day BIC Website Contact\n\n"
-    . "Please see website enquiry for $forWhom below.\n\n"
+$to = [MAIL_TO];
+$cc = MAIL_CC;
+$greeting = "Good day BIC Website Contact\n\n"
+    . "Please see website enquiry for $forWhom below.";
+if ($isContactForm && isset(CONTACT_TO[strtolower($campus)])) {
+    $subject = 'Contact Me Request: ' . $campus;
+    $to = CONTACT_TO[strtolower($campus)];
+    $cc = '';
+    $greeting = "Good day BIC Team\n\n"
+        . "Please see below a contact me request and details for $campus.";
+} elseif ($isInterviewForm && isset(INTERVIEW_TO[strtolower($campus)])) {
+    $subject = preg_replace('/\s+campus$/i', '', $campus) . ' College Website - Request for Interview';
+    $to = INTERVIEW_TO[strtolower($campus)];
+    $cc = '';
+    $greeting = "Good day BIC Team\n\n"
+        . "Please see below a contact me request and details for $campus.";
+}
+
+$body = $greeting . "\n\n"
     . implode("\n\n", $lines)
     . "\n\n--\nSent from the website enquiry form"
     . "\nPage: " . one_line($_SERVER['HTTP_REFERER'] ?? 'unknown')
@@ -231,7 +269,7 @@ $from = $smtp['username'];
 $headers = [
     'Date'                      => date('r'),
     'From'                      => mb_encode_mimeheader(FROM_NAME) . ' <' . $from . '>',
-    'To'                        => MAIL_TO,
+    'To'                        => implode(', ', $to),
     'Subject'                   => mb_encode_mimeheader($subject, 'UTF-8'),
     'Message-ID'                => '<' . bin2hex(random_bytes(12)) . '@' . substr(strrchr($from, '@'), 1) . '>',
     'MIME-Version'              => '1.0',
@@ -239,8 +277,8 @@ $headers = [
     'Content-Transfer-Encoding' => '8bit',
     'X-Mailer'                  => 'BIC website',
 ];
-if (MAIL_CC !== '') {
-    $headers['Cc'] = MAIL_CC;
+if ($cc !== '') {
+    $headers['Cc'] = $cc;
 }
 if ($replyTo !== '') {
     $headers['Reply-To'] = $replyTo; // "Reply" in your mail app goes to the visitor
@@ -252,7 +290,7 @@ foreach ($headers as $name => $value) {
 }
 $message .= "\r\n" . $body;
 
-$recipients = array_filter([MAIL_TO, MAIL_CC]);
+$recipients = array_filter(array_merge($to, [$cc]));
 
 try {
     smtp_send($smtp, $from, $recipients, $message);
