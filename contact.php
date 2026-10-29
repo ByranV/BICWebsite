@@ -248,13 +248,13 @@ if ($isContactForm && isset(CONTACT_TO[strtolower($campus)])) {
     $to = CONTACT_TO[strtolower($campus)];
     $cc = '';
     $greeting = "Good day BIC Team\n\n"
-        . "Please see below a contact me request and details for $campus.";
+        . "Please find below the details of a contact request for the $campus, submitted via the college website.";
 } elseif ($isInterviewForm && isset(INTERVIEW_TO[strtolower($campus)])) {
     $subject = preg_replace('/\s+campus$/i', '', $campus) . ' College Website - Request for Interview';
     $to = INTERVIEW_TO[strtolower($campus)];
     $cc = '';
     $greeting = "Good day BIC Team\n\n"
-        . "Please see below a contact me request and details for $campus.";
+        . "Please find below the details of a request for an interview at the $campus, submitted via the college website.";
 }
 
 $body = $greeting . "\n\n"
