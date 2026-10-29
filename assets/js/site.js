@@ -57,14 +57,28 @@
 
   function initForm(form) {
     var status = form.querySelector('.bic-form-status');
+    var button = form.querySelector('[type=submit]');
+    var buttonHtml = button.innerHTML;
+    var sending = false;
 
     function show(kind, text) {
       status.className = 'bic-form-status ' + kind;
       status.textContent = text;
     }
 
+    // disable the Send button and show a circular progress spinner while the request is in flight
+    function setSending(on) {
+      sending = on;
+      button.disabled = on;
+      button.setAttribute('aria-busy', on ? 'true' : 'false');
+      button.innerHTML = on
+        ? '<svg class="bic-spinner" viewBox="22 22 44 44" aria-hidden="true"><circle cx="44" cy="44" r="20.2" fill="none" stroke-width="3.6"></circle></svg>Sending…'
+        : buttonHtml;
+    }
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (sending) { return; }
       var fields = form.querySelectorAll('input[name], select[name], textarea[name]');
       var firstBad = null;
       var lines = [];
@@ -94,6 +108,8 @@
       // contact.php builds the email subject from the selected campus;
       // data-subject is only used by the mailto fallback below.
       if (CONFIG.formEndpoint) {
+        status.className = 'bic-form-status';
+        setSending(true);
         recaptchaToken().then(function (token) {
           data._recaptcha = token;
           return fetch(CONFIG.formEndpoint, {
@@ -107,6 +123,8 @@
           show('ok', 'Thank you. Your message has been sent.');
         }).catch(function () {
           show('err', 'Sorry, your message could not be sent. Please email ' + CONFIG.formEmail + '.');
+        }).then(function () {
+          setSending(false);
         });
         return;
       }
