@@ -10,11 +10,9 @@ To preview locally, serve the repo root with any static server (e.g. `php -S loc
 
 ## Deployment
 
-Pushing to a branch deploys it via GitHub Actions over FTP(S) to Afrihost hosting:
-- `development` → `.github/workflows/deploy-development.yml` (`development` environment)
-- `main` → `.github/workflows/deploy-main.yml` (`main` environment)
+Pushing to `main` deploys it via GitHub Actions (`.github/workflows/deploy-main.yml`, `main` environment) over FTP(S) to Afrihost hosting. `development` has no deploy workflow; changes reach production by a PR from `development` into `main`.
 
-The workflow rsyncs the repo into `_deploy/` (excluding `.git`, `.github`, `.claude`, `README.md`, `mail-config*.php`) and generates `mail-config.php` from environment secrets/variables. The two workflows are near-identical; keep them in sync when changing one. Pushing is effectively a production deploy, so only push when asked.
+The workflow rsyncs the repo into `_deploy/` (excluding `.git`, `.github`, `.claude`, `README.md`, `mail-config*.php`) and generates `mail-config.php` from environment secrets/variables. Pushing or merging to `main` is a production deploy, so only do it when asked.
 
 ## Page structure
 
