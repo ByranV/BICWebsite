@@ -42,6 +42,17 @@ RewriteRule ^stuart/?$ / [R=301,L]
 RewriteRule ^sibjects-offered-pta(/|\.html)?$ /pretoria/subjects-offered-pta.html [R=301,L]
 RewriteRule ^elementor-1087(/|\.html)?$ /examinations/admissions-worldwide.html [R=301,L]
 
+# Old Preparatory School pages (no longer on the site)
+RewriteRule ^(admissions|code-of-conduct|request-an-interview-3)/?$ / [R=301,L]
+
+# Old WordPress uploads -> /assets/docs/ (same file names)
+RewriteRule ^wp-content/uploads/2026/Application\sfor\sRegistration\sform\.pdf$ /assets/docs/Application_for_Registration_form.pdf [R=301,L]
+RewriteCond %{DOCUMENT_ROOT}/assets/docs/$1 -f
+RewriteRule ^wp-content/uploads/(?:[0-9]{4}/)?(?:[0-9]{2}/)?([^/]+\.pdf)$ /assets/docs/$1 [R=301,L]
+
+# Other WordPress entry points
+RewriteRule ^(index\.php|feed/?)$ / [R=301,L]
+
 # Old WordPress URLs: /about-us/ -> /about-us.html
 RewriteCond %{DOCUMENT_ROOT}/$1.html -f
 RewriteRule ^([a-z0-9-]+)/?$ /$1.html [R=301,L]
