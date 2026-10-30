@@ -228,6 +228,17 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-form input.invalid, .bic-form textarea.invalid { border-bottom-color: #d32f2f !important; box-shadow: 0 1px 0 0 #d32f2f !important; }
 .bic-req { color: #d32f2f; }
 .bic-form-actions { margin-top: .5rem; }
+/* circular progress shown in the Send button while a form is submitting */
+.bic-form button[aria-busy=true] { display: inline-flex; align-items: center; gap: 10px; }
+.bic-spinner { width: 20px; height: 20px; animation: bic-spin 1.4s linear infinite; }
+.bic-spinner circle { stroke: currentColor; stroke-linecap: round; stroke-dasharray: 80px, 200px; stroke-dashoffset: 0; animation: bic-dash 1.4s ease-in-out infinite; }
+@keyframes bic-spin { to { transform: rotate(360deg); } }
+@keyframes bic-dash {
+  0% { stroke-dasharray: 1px, 200px; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 100px, 200px; stroke-dashoffset: -15px; }
+  100% { stroke-dasharray: 100px, 200px; stroke-dashoffset: -125px; }
+}
+@media (prefers-reduced-motion: reduce) { .bic-spinner, .bic-spinner circle { animation-duration: 4s; } }
 .bic-form-status { margin: 1rem 0 0; padding: 12px 16px; border-radius: 10px; font-size: .95rem; display: none; }
 .bic-form-status.ok { display: block; background: #e7f6ec; color: #17603a; }
 .bic-form-status.err { display: block; background: #fdecea; color: #a1261d; }

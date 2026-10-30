@@ -429,3 +429,6 @@ FodyWeavers.xsd
 
 # Mailbox credentials for contact.php
 mail-config.php
+
+# Spellcheck issue lists (local reference only)
+spellcheck-*.txt
