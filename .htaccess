@@ -45,6 +45,9 @@ RewriteRule ^elementor-1087(/|\.html)?$ /examinations/admissions-worldwide.html 
 # Old Preparatory School pages (no longer on the site)
 RewriteRule ^(admissions|code-of-conduct|request-an-interview-3)/?$ / [R=301,L]
 
+# Replaced Distance College fee schedule (old copy, or its old WordPress upload path)
+RewriteRule ^(?:assets/docs|wp-content/uploads(?:/[0-9]{4})?(?:/[0-9]{2})?)/BIDC_SOF_2027_Early_Bird\.pdf$ /assets/docs/BIDC_Schedule_of_Fees_2027.pdf [R=301,L]
+
 # Old WordPress uploads -> /assets/docs/ (same file names)
 RewriteRule ^wp-content/uploads/2026/Application\sfor\sRegistration\sform\.pdf$ /assets/docs/Application_for_Registration_form.pdf [R=301,L]
 RewriteCond %{DOCUMENT_ROOT}/assets/docs/$1 -f
