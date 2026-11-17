@@ -55,11 +55,60 @@
     });
   }
 
+  // The visible Materialize dropdown that stands in for a native <select>.
+  function selectInput(select) {
+    var wrap = select.closest('.select-wrapper');
+    return wrap ? wrap.querySelector('input.select-dropdown') : null;
+  }
+
+  // Rebuild a select's Materialize dropdown after its options or value change in code.
+  function refreshSelect(select) {
+    var inst = M.FormSelect.getInstance(select);
+    if (inst) { inst.destroy(); }
+    M.FormSelect.init(select);
+  }
+
+  // "Level of Study" dropdown: list only the levels the chosen campus offers.
+  // Each level <option> names its campuses in data-campuses (comma-separated).
+  function initLevels(form) {
+    var level = form.querySelector('select[data-level-select]');
+    var campus = form.querySelector('select[name="Select Campus"]');
+    if (!level || !campus) { return function () {}; }
+    var placeholder = level.options[0];
+    var all = Array.prototype.slice.call(level.options, 1);
+
+    function sync() {
+      var chosen = level.value;
+      while (level.options.length > 1) { level.remove(1); }
+      all.forEach(function (opt) {
+        if (opt.getAttribute('data-campuses').split(',').indexOf(campus.value) !== -1) {
+          level.appendChild(opt);
+        }
+      });
+      level.value = chosen;
+      if (level.value !== chosen || !chosen) { placeholder.selected = true; }
+      refreshSelect(level);
+    }
+
+    campus.addEventListener('change', sync);
+    sync();
+    return function () { refreshSelect(campus); sync(); };
+  }
+
   function initForm(form) {
     var status = form.querySelector('.bic-form-status');
     var button = form.querySelector('[type=submit]');
     var buttonHtml = button.innerHTML;
     var sending = false;
+    var resetSelects = initLevels(form);
+
+    // clear a dropdown's error highlight once the visitor picks a value
+    form.querySelectorAll('select').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        var input = selectInput(sel);
+        if (input && sel.checkValidity()) { input.classList.remove('invalid'); }
+      });
+    });
 
     function show(kind, text) {
       status.className = 'bic-form-status ' + kind;
@@ -86,11 +135,14 @@
 
       fields.forEach(function (f) {
         var ok = f.checkValidity();
-        if (f.type !== 'hidden' && f.tagName !== 'SELECT') {
+        if (f.tagName === 'SELECT') {
+          var shown = selectInput(f);
+          if (shown) { shown.classList.toggle('invalid', !ok); }
+        } else if (f.type !== 'hidden') {
           f.classList.toggle('invalid', !ok);
           f.classList.toggle('valid', ok && f.value !== '');
         }
-        if (!ok && !firstBad) { firstBad = f; }
+        if (!ok && !firstBad) { firstBad = f.tagName === 'SELECT' ? (selectInput(f) || f) : f; }
         if (f.value) {
           lines.push(f.name + ': ' + f.value);
           data[f.name] = f.value;
@@ -120,6 +172,7 @@
         }).then(function (r) {
           if (!r.ok) { throw new Error(r.status); }
           form.reset();
+          resetSelects();
           show('ok', 'Thank you. Your message has been sent.');
         }).catch(function () {
           show('err', 'Sorry, your message could not be sent. Please email ' + CONFIG.formEmail + '.');

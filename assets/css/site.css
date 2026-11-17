@@ -244,6 +244,8 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-form-status.err { display: block; background: #fdecea; color: #a1261d; }
 .dropdown-content li > a, .dropdown-content li > span { color: var(--ink); }
 .dropdown-content li.selected > span { color: var(--blue-dark); }
+/* blank placeholder option (e.g. Level of Study): keep it out of the open list */
+.bic-form .select-wrapper .dropdown-content li.disabled:first-child { display: none; }
 
 /* slider */
 .bic-slider-wrap { position: relative; margin: 0 0 1.75rem; border-radius: 12px; overflow: hidden; background: var(--navy); }
