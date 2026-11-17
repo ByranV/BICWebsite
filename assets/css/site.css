@@ -267,8 +267,8 @@ a.bic-contact:hover { background: var(--blue-soft); }
 @media (max-width: 600px) { .bic-embed.bic-map { aspect-ratio: 4 / 3; } .bic-pdf-frame { height: 70vh; } }
 
 /* ---------- Home ---------- */
-.page-home .bic-content { padding-top: 0; }
-.page-home .bic-section { margin-top: 0; padding: clamp(28px, 4vw, 48px) 0 0; }
+.page-home .bic-content, .page-about-us .bic-content { padding-top: 0; }
+.page-home .bic-section, .page-about-us .bic-section { margin-top: 0; padding: clamp(28px, 4vw, 48px) 0 0; }
 .bic-announce { display: flex; gap: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 36px); border-left: 6px solid var(--blue); position: relative; }
 .bic-announce .bic-h { margin-top: 0; }
 .bic-announce-cta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0 0; }
@@ -282,7 +282,7 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-feature .bic-feature-icon { grid-column: 1; grid-row: 1; }
 .bic-feature .bic-h { grid-column: 2; grid-row: 1; align-self: center; margin: 0; font-size: 1.4rem; }
 .bic-feature .bic-rich { grid-column: 2; margin-top: 14px; }
-.page-home .bic-band { background: #e6ecf4; margin-top: clamp(20px, 3vw, 36px); padding: clamp(32px, 5vw, 56px) 0; }
+.page-home .bic-band, .page-about-us .bic-band { background: #e6ecf4; margin-top: clamp(20px, 3vw, 36px); padding: clamp(32px, 5vw, 56px) 0; }
 .bic-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .bic-section-head { text-align: center; margin: 0 auto clamp(18px, 3vw, 30px); max-width: 60ch; }
 .bic-section-head .bic-h { margin: 0 0 6px; }
@@ -296,6 +296,11 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-step-age { color: var(--blue-dark); font-weight: 500; font-size: .85rem; margin-bottom: 6px; }
 @media (max-width: 992px) { .bic-path { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .bic-path { grid-template-columns: 1fr; } }
+/* about page: key figures */
+.bic-stats { list-style: none; padding: 0; margin: 24px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.bic-stats li { display: flex; flex-direction: column; gap: 4px; padding: 18px; border-radius: 12px; background: var(--blue-soft); text-align: center; line-height: 1.4; font-size: .92rem; }
+.bic-stats strong { color: var(--blue-dark); font-size: 2rem; font-weight: 500; line-height: 1.1; }
+@media (max-width: 992px) { .bic-stats { grid-template-columns: repeat(2, 1fr); } }
 /* campus summary cards */
 .bic-cc-row { display: flex; flex-wrap: wrap; margin: 0 -12px; }
 .bic-cc-row > .col { padding: 0 12px; margin: 0 0 24px; display: flex; }
