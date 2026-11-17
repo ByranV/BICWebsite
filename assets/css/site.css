@@ -30,7 +30,7 @@
 }
 
 /* ---------- Base ---------- */
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 130px; }
 body {
   font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--text); background: var(--bg); line-height: 1.65; font-size: 16px;
@@ -267,8 +267,10 @@ a.bic-contact:hover { background: var(--blue-soft); }
 /* ---------- Home ---------- */
 .page-home .bic-content { padding-top: 0; }
 .page-home .bic-section { margin-top: 0; padding: clamp(28px, 4vw, 48px) 0 0; }
-.bic-announce { display: flex; gap: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 36px); border-left: 6px solid var(--blue); margin-top: clamp(-70px, -5vw, -36px); position: relative; }
+.bic-announce { display: flex; gap: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 36px); border-left: 6px solid var(--blue); position: relative; }
 .bic-announce .bic-h { margin-top: 0; }
+.bic-announce-cta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0 0; }
+.bic-announce-cta .btn-flat { color: var(--blue-dark); }
 .bic-announce-icon, .bic-feature-icon { flex: 0 0 52px; width: 52px; height: 52px; border-radius: 14px; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; }
 .bic-announce-icon i, .bic-feature-icon i { font-size: 28px; }
 .bic-features { display: flex; flex-wrap: wrap; margin: 0 -12px; }
@@ -279,15 +281,55 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-feature .bic-h { grid-column: 2; grid-row: 1; align-self: center; margin: 0; font-size: 1.4rem; }
 .bic-feature .bic-rich { grid-column: 2; margin-top: 14px; }
 .page-home .bic-band { background: #e6ecf4; margin-top: clamp(20px, 3vw, 36px); padding: clamp(32px, 5vw, 56px) 0; }
-.bic-campuses { margin: 0 -12px; display: flex; flex-wrap: wrap; }
-.bic-campuses > .col { padding: 0 12px; margin: 0; }
-a.bic-campus.card { display: block; border-radius: var(--radius); overflow: hidden; color: var(--ink); margin: 12px 0; box-shadow: var(--shadow); }
-.bic-campus .card-image { display: block; aspect-ratio: 16 / 10; overflow: hidden; }
-.bic-campus .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
-.bic-campus:hover .card-image img { transform: scale(1.05); }
-.bic-campus .card-content { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; }
-.bic-campus .card-title { font-size: 1.2rem; font-weight: 500; line-height: 1.3; margin: 0; }
-.bic-campus .card-content i { color: var(--blue-dark); }
+.bic-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.bic-section-head { text-align: center; margin: 0 auto clamp(18px, 3vw, 30px); max-width: 60ch; }
+.bic-section-head .bic-h { margin: 0 0 6px; }
+.bic-section-head p { margin: 0; color: var(--muted); font-size: 1.05rem; }
+/* Cambridge pathway steps */
+.bic-intro .bic-h { margin-top: 0; }
+.bic-path { list-style: none; padding: 0; margin: 24px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: none; }
+.bic-path li { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 18px 18px 18px; border-radius: 12px; background: var(--bg); border-top: 4px solid var(--blue); line-height: 1.45; font-size: .95rem; }
+.bic-path strong { color: var(--ink); font-size: 1.15rem; font-weight: 500; }
+.bic-step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font-size: .85rem; font-weight: 500; margin-bottom: 8px; }
+.bic-step-age { color: var(--blue-dark); font-weight: 500; font-size: .85rem; margin-bottom: 6px; }
+@media (max-width: 992px) { .bic-path { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .bic-path { grid-template-columns: 1fr; } }
+/* campus summary cards */
+.bic-cc-row { display: flex; flex-wrap: wrap; margin: 0 -12px; }
+.bic-cc-row > .col { padding: 0 12px; margin: 0 0 24px; display: flex; }
+.bic-cc { width: 100%; display: flex; flex-direction: column; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.bic-cc-img { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; }
+.bic-cc-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.bic-cc:hover .bic-cc-img img { transform: scale(1.04); }
+.bic-cc-tag { position: absolute; left: 16px; top: 16px; background: rgba(20, 35, 58, .85); color: #fff; font-size: .8rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
+.bic-cc-body { flex: 1; display: flex; flex-direction: column; padding: clamp(20px, 2.4vw, 28px); }
+.bic-cc-body h3.bic-h { margin: 0 0 10px; font-size: 1.5rem; }
+.bic-cc-lead { margin: 0 0 16px; }
+.bic-cc-levels { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.bic-cc-levels li { background: var(--blue-soft); color: var(--blue-dark); font-size: .85rem; font-weight: 500; padding: 4px 12px; border-radius: 999px; }
+.bic-cc-facts { margin: 0 0 22px; border-top: 1px solid var(--line); padding-top: 16px; }
+.bic-cc-facts li { display: flex; gap: 12px; align-items: flex-start; padding: 5px 0; font-size: .95rem; line-height: 1.45; }
+.bic-cc-facts i { font-size: 20px; color: var(--blue-dark); flex: 0 0 20px; }
+.bic-cc-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bic-cc-actions .btn-flat { color: var(--blue-dark); }
+/* comparison table */
+.bic-compare { overflow-x: auto; margin-top: 18px; }
+.bic-compare table { width: 100%; min-width: 560px; border-collapse: collapse; }
+.bic-compare th, .bic-compare td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: middle; line-height: 1.4; border-radius: 0; }
+.bic-compare thead th { font-size: 1.1rem; font-weight: 500; border-bottom: 2px solid var(--blue); }
+.bic-compare thead a { color: var(--ink); }
+.bic-compare thead a:hover { color: var(--blue-dark); }
+.bic-compare tbody th { text-align: left; font-weight: 500; color: var(--ink); width: 28%; }
+.bic-compare tbody tr:last-child th, .bic-compare tbody tr:last-child td { border-bottom: 0; }
+.bic-compare td a { font-weight: 500; }
+.bic-yes i { color: #1e9e5a; }
+.bic-no { color: var(--muted); font-size: 1.2rem; }
+@media (max-width: 600px) {
+  .bic-compare table { min-width: 0; font-size: .82rem; }
+  .bic-compare th, .bic-compare td { padding: 10px 4px; }
+  .bic-compare thead th { font-size: .9rem; }
+  .bic-compare tbody th { width: 31%; padding-left: 0; }
+}
 @media (max-width: 600px) {
   .bic-announce { flex-direction: column; gap: 14px; }
   .bic-feature { column-gap: 14px; }
