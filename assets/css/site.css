@@ -465,6 +465,18 @@ img.bic-deco-img { max-width: 180px; }
 /* four steps inside the two-thirds column read better as a 2 x 2 grid */
 .col.l8 .bic-path.bic-path-4 { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 480px) { .col.l8 .bic-path.bic-path-4 { grid-template-columns: 1fr; } }
+/* examinations */
+a.bic-more { font-weight: 500; text-decoration: none !important; }
+a.bic-more:hover { text-decoration: underline !important; }
+.bic-note.bic-note-warn { background: #fdecea; color: #a1261d; }
+.bic-paper.bic-callout { border-left: 6px solid var(--blue); }
+.bic-paper.bic-callout .bic-h { margin-top: 0; }
+.bic-chip-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.bic-chip-link { display: inline-block; padding: 8px 16px; border-radius: 999px; background: var(--blue-soft); color: var(--blue-dark); font-weight: 500; }
+.bic-chip-link:hover { background: var(--blue); color: #fff; }
+.bic-price { display: inline-block; margin: 0 0 10px !important; padding: 4px 12px; border-radius: 999px; background: #eef8f1; color: #17603a; font-weight: 500; }
+.bic-center-text { text-align: center; max-width: 70ch; margin: 0 auto 20px; }
+.bic-features-wide .bic-feature .bic-rich { grid-column: 1 / -1; }
 /* buttons inside rich text are not underlined like links */
 .bic-rich a.btn, .bic-rich a.btn-large, .bic-rich a.btn-flat { text-decoration: none; }
 /* platform cards */
