@@ -390,6 +390,87 @@ figure.bic-quote { width: 100%; margin: 0; display: flex; flex-direction: column
 .bic-person p { margin: 0 0 8px; }
 .bic-person-role { color: var(--blue-dark); font-weight: 500; }
 
+/* ---------- Section pages (Bryanston and others) ---------- */
+.bic-hero-lead { margin: 12px 0 0; color: #d5e1ee; font-size: clamp(1rem, 1.6vw, 1.12rem); line-height: 1.55; max-width: 64ch; }
+.bic-aside.bic-aside-static { position: static; }
+.bic-aside > .bic-paper + .bic-paper { margin-top: 24px; }
+/* "next step" band */
+.bic-cta-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; border-radius: var(--radius); padding: clamp(24px, 3.4vw, 40px);
+  background: linear-gradient(115deg, var(--navy) 0%, var(--navy-2) 60%, #244a86 100%); color: #e3ebf5; box-shadow: var(--shadow); }
+.bic-cta-band .bic-h { color: #fff; margin: 0 0 6px; font-size: clamp(1.3rem, 2.4vw, 1.65rem); }
+.bic-cta-band p { margin: 0; max-width: 56ch; }
+.bic-cta-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.bic-btn-ghost, .bic-btn-ghost:focus { background: rgba(255, 255, 255, .12) !important; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .7) !important; color: #fff; }
+.bic-btn-ghost:hover { background: rgba(255, 255, 255, .22) !important; }
+.bic-cta-band.bic-cta-light { background: #fff; color: var(--text); border-left: 6px solid var(--blue); }
+.bic-cta-light .bic-h { color: var(--ink); }
+.bic-cta-light .btn i { vertical-align: middle; font-size: 1.1rem; margin-right: 4px; }
+/* "why" mini features inside a paper */
+.bic-mini-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0 8px; }
+.bic-mini { display: flex; gap: 14px; padding: 16px 18px; border-radius: 12px; background: var(--bg); }
+.bic-mini > i { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 10px; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; font-size: 22px; }
+.bic-mini .bic-h { margin: 2px 0 4px; font-size: 1.05rem; }
+.bic-mini p { margin: 0; font-size: .95rem; line-height: 1.5; }
+@media (max-width: 600px) { .bic-mini-grid { grid-template-columns: 1fr; } }
+.bic-stats.bic-stats-3 { grid-template-columns: repeat(3, 1fr); }
+.bic-stats.bic-stats-2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 600px) { .bic-stats.bic-stats-3 { grid-template-columns: 1fr; } }
+.bic-quickfacts .bic-h { margin-top: 0; }
+.bic-quickfacts .bic-cc-facts { margin-bottom: 0; }
+/* three- and four-step paths */
+.bic-path.bic-path-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .bic-path.bic-path-3 { grid-template-columns: 1fr; } }
+.bic-path li a { text-decoration: underline; text-underline-offset: 2px; }
+/* course level cards */
+.bic-level { width: 100%; display: flex; flex-direction: column; }
+.bic-level-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.bic-level-head .bic-h { margin: 0; font-size: 1.45rem; }
+.bic-level-tag { background: var(--blue-soft); color: var(--blue-dark); font-size: .85rem; font-weight: 500; padding: 4px 12px; border-radius: 999px; }
+.bic-level h4.bic-h { font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--blue-dark); margin: 1em 0 .6em; }
+.bic-level-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.bic-level-list li { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; font-size: .9rem; }
+.bic-level-grow { margin: auto 0 0; display: flex; gap: 10px; align-items: flex-start; background: #eef8f1; color: #17603a; border-radius: 10px; padding: 12px 14px; font-size: .95rem; line-height: 1.45; }
+.bic-level-grow strong { color: #17603a; font-weight: 500; }
+.bic-level-grow i { font-size: 20px; }
+/* checklists and "what to expect" */
+.bic-rich ul.bic-checklist { padding-left: 0; columns: 2 280px; column-gap: 32px; }
+.bic-rich ul.bic-checklist > li { list-style: none; position: relative; padding-left: 30px; break-inside: avoid; }
+.bic-rich ul.bic-checklist > li::before { content: "check_circle"; font-family: "Material Icons"; position: absolute; left: 0; top: 0; color: #1e9e5a; font-size: 20px; line-height: 1.3; }
+.bic-expect { margin: 0 0 16px; padding: 0; display: grid; gap: 12px; }
+.bic-expect li { display: flex; gap: 12px; align-items: flex-start; line-height: 1.45; }
+.bic-expect i { flex: 0 0 36px; height: 36px; border-radius: 50%; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; font-size: 20px; }
+.bic-note { display: flex; gap: 12px; align-items: flex-start; background: #fff8e6; border-radius: 10px; padding: 12px 16px; margin: 16px 0 0; color: #6b4e00; }
+.bic-note p { margin: 0; }
+/* results */
+.bic-award-head { display: flex; align-items: center; justify-content: center; gap: 12px; text-align: center; margin-top: 0; }
+.bic-award-head img { width: 40px; height: 40px; }
+.bic-achievers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 0; }
+.bic-achievers li { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 12px; background: var(--bg); border-left: 4px solid var(--blue); line-height: 1.45; }
+.bic-achievers strong { color: var(--ink); font-weight: 500; }
+.bic-achievers span { color: var(--muted); font-size: .92rem; }
+@media (max-width: 992px) { .bic-achievers { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .bic-achievers { grid-template-columns: 1fr; } }
+figure.bic-quote-wide .bic-h { margin-top: 0; }
+figure.bic-quote-wide blockquote p { margin: 0 0 .8em; }
+/* images in two-column rows (img.* beats Materialize's img.responsive-img) */
+img.bic-badge { max-width: 200px; }
+img.bic-story-img { border-radius: 12px; display: block; }
+img.bic-deco-img { max-width: 180px; }
+/* spacing after blocks that end a group */
+.bic-intro .bic-rich + .bic-h, .bic-stats + .bic-h { margin-top: 28px; }
+.bic-stats + .bic-rich { margin-top: 28px; }
+/* buttons inside rich text are not underlined like links */
+.bic-rich a.btn, .bic-rich a.btn-large, .bic-rich a.btn-flat { text-decoration: none; }
+/* platform cards */
+.bic-platform { width: 100%; display: flex; flex-direction: column; }
+.bic-platform-logo { height: 90px; display: flex; align-items: center; margin-bottom: 8px; }
+.bic-platform-logo img { max-height: 72px; max-width: 220px; width: auto; height: auto; }
+.bic-platform .bic-h { margin: 0 0 8px; font-size: 1.3rem; }
+.bic-platform-cta { margin: auto 0 0; padding-top: 8px; }
+@media (max-width: 992px) {
+  .bic-row-top .bic-aside { margin-top: 0; }
+}
+
 /* ---------- Placeholders: content still to be supplied by BIC (replace all before merging to main) ---------- */
 .bic-ph { background: #fff4c2; color: #6b4e00; outline: 1px dashed #c99a00; border-radius: 4px; padding: 0 4px; font-style: italic; font-weight: 400; font-size: .95rem; }
 .bic-stats strong .bic-ph { font-size: .9rem; display: inline-block; line-height: 1.4; }
