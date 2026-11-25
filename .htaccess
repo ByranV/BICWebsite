@@ -27,7 +27,7 @@ RewriteRule ^(bryanston-campus|subjects-offered-2|applications|request-an-interv
 # Pretoria Campus pages moved into /pretoria/
 RewriteRule ^(pretoria-campus|subjects-offered-pta|request-an-interview-2|eresources-2)(/|\.html)?$ /pretoria/$1.html [R=301,L]
 
-# Distance Campus pages moved into /distance/
+# Distance College pages moved into /distance/
 RewriteRule ^(distance-campus|about-distance-college|subjects-offered|course-fees|online-registration|examination-entry|accredited-study-center|eresources-4|results-2)(/|\.html)?$ /distance/$1.html [R=301,L]
 
 # Examinations pages moved into /examinations/

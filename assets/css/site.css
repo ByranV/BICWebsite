@@ -145,6 +145,16 @@ nav .bic-sub li.parent a { font-weight: 500; }
 .bic-row-inner { display: flex; flex-wrap: wrap; align-items: center; margin: 0 -.75rem 1.25rem; }
 .bic-row-inner > .col { margin-left: 0; }
 @media (min-width: 993px) { .bic-aside { position: sticky; top: 136px; } }
+/* Opt-in: on desktop, stretch both columns to the same height (main column and aside) */
+@media (min-width: 993px) {
+  .bic-row-equal { align-items: stretch; }
+  .bic-row-equal > .col { margin-bottom: 0; }
+  .bic-row-equal > .col > .bic-paper { height: 100%; }
+  .bic-row-equal > .bic-aside { position: static; }
+  /* A map at the end of a stretched box fills the space left below the content above it */
+  .bic-row-equal > .col > .bic-paper-flex { display: flex; flex-direction: column; }
+  .bic-paper-flex > .bic-map-fill { flex: 1 1 auto; aspect-ratio: auto; min-height: 220px; margin-bottom: 0; }
+}
 
 .bic-h { color: var(--ink); font-weight: 500; line-height: 1.25; margin: 1.6em 0 .6em; }
 h2.bic-h { font-size: clamp(1.45rem, 2.6vw, 1.85rem); }

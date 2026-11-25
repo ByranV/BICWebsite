@@ -19,7 +19,7 @@ const FROM_NAME = 'BIC Website';                 // mail is sent from the SMTP m
 const CONTACT_TO = [
     'bryanston campus' => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
     'pretoria campus'  => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'AcademicAdmin@bicollege.co.za'],
-    'distance campus'  => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'studentadvisor2@bidc.co.za'],
+    'distance college' => ['systemssupport@bicollege.co.za', 'website@bicollege.co.za', 'studentadvisor2@bidc.co.za'],
 ];
 // "Request an Interview" forms for these campuses go to the listed addresses instead
 // (subject "<Bryanston> College Website - Request for Interview").
