@@ -368,6 +368,8 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-chips li { background: #fff; color: var(--blue-dark); border: 1px solid #cddbf3; font-weight: 500; font-size: .92rem; padding: 6px 16px; border-radius: 999px; }
 .bic-paper .bic-chips li { background: var(--blue-soft); border-color: transparent; }
 .bic-btn-center { justify-content: center; margin-bottom: 0; }
+.bic-chips-label.bic-values-label { margin-top: 22px; }
+.bic-chips.bic-values li { background: var(--navy); color: #fff; border-color: transparent; }
 /* mission and vision */
 .bic-purpose { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 18px 0 8px; }
 .bic-purpose > div { background: var(--blue-soft); border-radius: 12px; border-left: 5px solid var(--blue); padding: 20px 22px; }
