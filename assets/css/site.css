@@ -459,6 +459,12 @@ img.bic-deco-img { max-width: 180px; }
 /* spacing after blocks that end a group */
 .bic-intro .bic-rich + .bic-h, .bic-stats + .bic-h { margin-top: 28px; }
 .bic-stats + .bic-rich { margin-top: 28px; }
+.bic-rich + .bic-table { margin-top: 16px; }
+.bic-mini-grid + .bic-rich { margin-top: 16px; }
+.bic-row-inner > .col > :first-child { margin-top: 0; }
+/* four steps inside the two-thirds column read better as a 2 x 2 grid */
+.col.l8 .bic-path.bic-path-4 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 480px) { .col.l8 .bic-path.bic-path-4 { grid-template-columns: 1fr; } }
 /* buttons inside rich text are not underlined like links */
 .bic-rich a.btn, .bic-rich a.btn-large, .bic-rich a.btn-flat { text-decoration: none; }
 /* platform cards */
