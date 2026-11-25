@@ -293,6 +293,8 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-feature .bic-h { grid-column: 2; grid-row: 1; align-self: center; margin: 0; font-size: 1.4rem; }
 .bic-feature .bic-rich { grid-column: 2; margin-top: 14px; }
 .page-home .bic-band, .page-about-us .bic-band { background: #e6ecf4; margin-top: clamp(20px, 3vw, 36px); padding: clamp(32px, 5vw, 56px) 0; }
+/* two bands in a row read as one continuous band */
+.page-home .bic-band + .bic-band, .page-about-us .bic-band + .bic-band { margin-top: 0; padding-top: 0; }
 .bic-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .bic-section-head { text-align: center; margin: 0 auto clamp(18px, 3vw, 30px); max-width: 60ch; }
 .bic-section-head .bic-h { margin: 0 0 6px; }
@@ -352,6 +354,51 @@ a.bic-contact:hover { background: var(--blue-soft); }
   .bic-feature { column-gap: 14px; }
   .bic-feature .bic-rich { grid-column: 1 / -1; } /* phones: text uses the full card width below icon + heading */
 }
+
+/* five-step pathway (ends in "University & beyond") */
+.bic-path.bic-path-5 { grid-template-columns: repeat(5, 1fr); }
+.bic-path li.bic-path-goal { background: var(--blue-soft); border-top-color: var(--navy); }
+.bic-path li.bic-path-goal .bic-step-num { background: var(--navy); }
+@media (max-width: 1200px) { .bic-path.bic-path-5 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 992px) { .bic-path.bic-path-5 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .bic-path.bic-path-5 { grid-template-columns: 1fr; } }
+/* skill chips */
+.bic-chips-label { text-align: center; margin: 8px 0 0; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--blue-dark); font-weight: 500; }
+.bic-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 14px 0 0; }
+.bic-chips li { background: #fff; color: var(--blue-dark); border: 1px solid #cddbf3; font-weight: 500; font-size: .92rem; padding: 6px 16px; border-radius: 999px; }
+.bic-paper .bic-chips li { background: var(--blue-soft); border-color: transparent; }
+.bic-btn-center { justify-content: center; margin-bottom: 0; }
+/* mission and vision */
+.bic-purpose { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 18px 0 8px; }
+.bic-purpose > div { background: var(--blue-soft); border-radius: 12px; border-left: 5px solid var(--blue); padding: 20px 22px; }
+.bic-purpose .bic-h { margin: 0 0 8px; font-size: 1.15rem; color: var(--blue-dark); }
+.bic-purpose p { margin: 0; font-size: 1.05rem; line-height: 1.55; color: var(--ink); }
+@media (max-width: 760px) { .bic-purpose { grid-template-columns: 1fr; } }
+.bic-values-head { margin-top: clamp(28px, 4vw, 44px); }
+.bic-purpose + .bic-rich { margin-top: 26px; }
+/* four-across feature cards are narrow: let the text use the full card width below icon + heading */
+.col.l3 > .bic-feature .bic-rich { grid-column: 1 / -1; }
+/* testimonials */
+figure.bic-quote { width: 100%; margin: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.bic-quote blockquote { margin: 0 0 16px; padding: 0 0 0 18px; border-left: 4px solid var(--blue); font-size: 1.05rem; }
+.bic-quote blockquote p { margin: 0; }
+.bic-quote figcaption { color: var(--muted); font-size: .92rem; }
+/* people */
+.bic-person { width: 100%; text-align: center; }
+.bic-person .bic-ph-img { aspect-ratio: 1; max-width: 160px; margin: 0 auto 14px; border-radius: 50%; }
+.bic-person .bic-h { margin: 0 0 4px; font-size: 1.15rem; }
+.bic-person p { margin: 0 0 8px; }
+.bic-person-role { color: var(--blue-dark); font-weight: 500; }
+
+/* ---------- Placeholders: content still to be supplied by BIC (replace all before merging to main) ---------- */
+.bic-ph { background: #fff4c2; color: #6b4e00; outline: 1px dashed #c99a00; border-radius: 4px; padding: 0 4px; font-style: italic; font-weight: 400; font-size: .95rem; }
+.bic-stats strong .bic-ph { font-size: .9rem; display: inline-block; line-height: 1.4; }
+.bic-ph-block { background: #fffaf0; border: 2px dashed #e0b100; border-radius: 12px; padding: 16px 20px; color: #6b4e00; font-style: italic; margin: 12px 0; }
+.bic-ph-block p { margin: 0; }
+.bic-ph-img { aspect-ratio: 16 / 9; display: grid; place-items: center; text-align: center; padding: 16px; border: 2px dashed #e0b100; border-radius: 12px; color: #6b4e00; font-style: italic; font-size: .9rem;
+  background: repeating-linear-gradient(45deg, #fff8dc, #fff8dc 12px, #fff3c4 12px, #fff3c4 24px); }
+.bic-ph-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+@media (max-width: 760px) { .bic-ph-grid { grid-template-columns: 1fr; } }
 
 /* ---------- Site map ---------- */
 .bic-sitemap h2.bic-h { font-size: 1.2rem; margin-top: 0; }
