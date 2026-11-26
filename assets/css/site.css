@@ -408,7 +408,7 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-cc-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
 .bic-cc:hover .bic-cc-img img { transform: scale(1.04); }
 .bic-cc-tag { position: absolute; left: 16px; top: 16px; background: rgba(20, 35, 58, .85); color: #fff; font-size: .8rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; padding: 5px 12px; border-radius: 999px; }
-.bic-cc-body { flex: 1; display: flex; flex-direction: column; padding: clamp(20px, 2.4vw, 28px); }
+.bic-cc-body { flex: 1; display: flex; flex-direction: column; padding: clamp(20px, 2.4vw, 28px); container-type: inline-size; }
 .bic-cc-body h3.bic-h { margin: 0 0 10px; font-size: 1.5rem; }
 .bic-cc-lead { margin: 0 0 16px; }
 .bic-cc-levels { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
@@ -416,7 +416,11 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-cc-facts { margin: 0 0 22px; border-top: 1px solid var(--line); padding-top: 16px; }
 .bic-cc-facts li { display: flex; gap: 12px; align-items: flex-start; padding: 5px 0; font-size: .95rem; line-height: 1.45; }
 .bic-cc-facts i { font-size: 20px; color: var(--blue-dark); flex: 0 0 20px; }
-.bic-cc-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* card buttons: slightly smaller; main action on the left, "Courses offered" pushed to the right edge (same inset as the left).
+   The cards are equal width, so all three stack together when narrow. */
+.bic-cc-actions { margin-top: auto; display: grid; grid-template-columns: auto auto; justify-content: space-between; gap: 8px; }
+.bic-cc-actions .btn, .bic-cc-actions .btn-flat { min-height: 40px; padding: 8px 20px; font-size: .875rem; white-space: nowrap; }
+@container (max-width: 303px) { .bic-cc-actions { grid-template-columns: 1fr; justify-content: stretch; } }
 .bic-cc-actions .btn-flat { color: var(--blue-dark); }
 /* comparison table */
 .bic-compare { overflow-x: auto; margin-top: 18px; }
@@ -428,7 +432,11 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-compare tbody th { text-align: left; font-weight: 500; color: var(--ink); width: 28%; }
 .bic-compare tbody tr:last-child th, .bic-compare tbody tr:last-child td { border-bottom: 0; }
 .bic-compare td a { font-weight: 500; }
-.bic-yes i { color: #1e9e5a; }
+/* "How to join" buttons: compact so they fit the table cells; they may wrap onto two lines on phones */
+.bic-compare td .btn { min-height: 38px; padding: 7px 16px; font-size: .875rem; }
+@media (max-width: 600px) { .bic-compare td .btn { min-height: 36px; padding: 7px 8px; font-size: .8rem; line-height: 1.2; border-radius: 10px; width: 100%; } }
+.bic-compare tbody tr:last-child { border-bottom: 0; }
+.bic-yes i { color: var(--blue); } /* comparison ticks: brand blue, not green */
 .bic-no { color: var(--muted); font-size: 1.2rem; }
 @media (max-width: 600px) {
   .bic-compare table { min-width: 0; font-size: .82rem; }
