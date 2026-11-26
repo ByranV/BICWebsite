@@ -170,7 +170,7 @@ nav .bic-enquire:hover, nav .bic-enquire:focus { background: #d8b766; color: var
 /* section photo (a real <img class="bic-hero-img">, compressed WebP from assets/img/min/) behind a navy overlay */
 .bic-hero-img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center; }
 .bic-hero-exam .bic-hero-img { object-position: center 30%; }
-.bic-hero-photo::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(14, 26, 44, .95) 0%, rgba(20, 35, 58, .88) 50%, rgba(20, 35, 58, .6) 100%); }
+.bic-hero-photo::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(14, 26, 44, .82) 0%, rgba(20, 35, 58, .58) 45%, rgba(20, 35, 58, .12) 100%); } /* same overlay as the home page hero */
 .bic-hero h1 { margin: 0; font-family: var(--serif); font-size: clamp(1.75rem, 4.2vw, 2.7rem); font-weight: 600; line-height: 1.18; max-width: 26ch; }
 .bic-crumbs { margin: 0 0 10px; font-size: .85rem; color: #b9c8db; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 .bic-crumbs a { color: inherit; }
@@ -179,6 +179,11 @@ nav .bic-enquire:hover, nav .bic-enquire:focus { background: #d8b766; color: var
 
 .bic-home-hero { position: relative; overflow: hidden; background: var(--navy); color: #fff; padding: clamp(56px, 10vw, 120px) 0; isolation: isolate; }
 .bic-home-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(14, 26, 44, .82) 0%, rgba(20, 35, 58, .58) 45%, rgba(20, 35, 58, .12) 100%); }
+/* the lighter photo overlay keeps text readable with a soft shadow; phones get an even overlay because text spans the full width */
+.bic-hero h1, .bic-hero-lead, .bic-crumbs, .bic-home-hero h1, .bic-home-hero .bic-rich { text-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
+@media (max-width: 600px) {
+  .bic-hero-photo::before, .bic-home-hero::before { background: linear-gradient(180deg, rgba(14, 26, 44, .74) 0%, rgba(20, 35, 58, .6) 100%); }
+}
 .bic-home-hero h1 { margin: 0 0 18px; font-family: var(--serif); font-size: clamp(2.1rem, 5.4vw, 3.6rem); font-weight: 600; line-height: 1.1; max-width: 17ch; }
 .bic-home-hero .bic-rich { font-size: clamp(1rem, 1.6vw, 1.15rem); max-width: 62ch; color: #e3ebf5; }
 .bic-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 0; }
@@ -472,6 +477,18 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-purpose p { margin: 0; font-size: 1.05rem; line-height: 1.55; color: var(--ink); }
 @media (max-width: 760px) { .bic-purpose { grid-template-columns: 1fr; } }
 .bic-values-head { margin-top: clamp(28px, 4vw, 44px); }
+/* About Us: purpose, values and approach merged into one panel, in parts split by a thin rule */
+.bic-merge-part { margin-top: 28px; padding-top: 26px; border-top: 1px solid var(--line); }
+.bic-merge > h2.bic-h + .bic-merge-part { margin-top: 18px; padding-top: 0; border-top: 0; }
+.bic-merge-part > h3.bic-h { margin: 0 0 6px; }
+.bic-merge-part .bic-rich h4.bic-h { margin: 22px 0 8px; font-size: 1.15rem; }
+.bic-merge-sub { margin: 0; color: var(--muted); }
+.bic-merge .bic-mini-grid { margin: 18px 0 0; }
+.bic-mini-grid.bic-merge-4 { grid-template-columns: repeat(4, 1fr); }
+.bic-mini-grid.bic-merge-3 { grid-template-columns: repeat(3, 1fr); }
+.bic-merge-4 .bic-mini, .bic-merge-3 .bic-mini { flex-direction: column; gap: 10px; }
+@media (max-width: 1100px) { .bic-mini-grid.bic-merge-4, .bic-mini-grid.bic-merge-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .bic-mini-grid.bic-merge-4, .bic-mini-grid.bic-merge-3 { grid-template-columns: 1fr; } .bic-merge-4 .bic-mini, .bic-merge-3 .bic-mini { flex-direction: row; } }
 .bic-purpose + .bic-rich { margin-top: 26px; }
 /* four-across feature cards are narrow: let the text use the full card width below icon + heading */
 .col.l3 > .bic-feature .bic-rich { grid-column: 1 / -1; }
