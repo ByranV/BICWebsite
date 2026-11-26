@@ -373,6 +373,26 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .page-home .bic-section, .page-about-us .bic-section { margin-top: 0; padding: clamp(28px, 4vw, 48px) 0 0; }
 .bic-announce { display: flex; gap: 20px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(20px, 3.2vw, 36px); border-left: 6px solid var(--blue); position: relative; }
 .bic-announce .bic-h { margin-top: 0; }
+/* an announcement placed inside a white panel: tinted instead of a second card shadow */
+.bic-paper .bic-announce { margin: 22px 0 30px; background: var(--bg); box-shadow: none; }
+/* feature highlight (Bryanston 2027 intake): navy panel, gold label and tag, level bubbles */
+.bic-announce.bic-announce-feature, .bic-paper .bic-announce.bic-announce-feature { --ap: clamp(20px, 3.2vw, 36px); padding: var(--ap); flex-wrap: wrap; overflow: hidden;
+  border-left: 0; color: #e3ebf5; box-shadow: var(--shadow); background: linear-gradient(115deg, var(--navy) 0%, var(--navy-2) 60%, var(--navy-3) 100%); }
+.bic-announce-feature > div { flex: 1 1 0; min-width: 0; }
+.bic-announce-feature .bic-h { color: #fff; }
+.bic-announce-feature .bic-announce-icon { background: rgba(198, 161, 74, .18); color: var(--gold); }
+.bic-eyebrow { margin: 0 0 6px; font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.bic-announce-feature .bic-rich { margin-top: 10px; }
+/* levels: a plain list with gold ticks (not button-like) */
+.bic-announce-levels { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .15); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+.bic-announce-levels-label { font-size: .9rem; color: #b9c8db; }
+.bic-announce-levels ul { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; }
+.bic-announce-levels li { display: inline-flex; align-items: center; gap: 6px; color: #fff; font-weight: 500; }
+.bic-announce-levels li::before { content: "check"; font-family: "Material Icons"; font-feature-settings: "liga"; font-weight: normal; font-size: 18px; line-height: 1; color: var(--gold); }
+/* "places are limited": a full-width gold strip along the bottom of the panel */
+.bic-announce-note { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; margin: 4px calc(-1 * var(--ap)) calc(-1 * var(--ap)); padding: 12px var(--ap);
+  background: var(--gold); color: var(--navy-deep); font-weight: 500; font-size: .95rem; }
+.bic-announce-note .material-icons { font-size: 20px; }
 .bic-announce-cta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0 0; }
 .bic-announce-cta .btn-flat { color: var(--blue-dark); }
 .bic-announce-icon, .bic-feature-icon { flex: 0 0 52px; width: 52px; height: 52px; border-radius: 14px; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; }
@@ -451,6 +471,7 @@ a.bic-contact:hover { background: var(--blue-soft); }
 }
 @media (max-width: 600px) {
   .bic-announce { flex-direction: column; gap: 14px; }
+  .bic-announce-feature > div, .bic-announce-note { flex: 0 0 auto; }
   .bic-feature { column-gap: 14px; }
   .bic-feature .bic-rich { grid-column: 1 / -1; } /* phones: text uses the full card width below icon + heading */
 }
@@ -512,6 +533,23 @@ figure.bic-quote { width: 100%; margin: 0; display: flex; flex-direction: column
 .bic-hero-lead { margin: 12px 0 0; color: #d5e1ee; font-size: clamp(1rem, 1.6vw, 1.12rem); line-height: 1.55; max-width: 64ch; }
 .bic-aside.bic-aside-static { position: static; }
 .bic-aside > .bic-paper + .bic-paper { margin-top: 24px; }
+.col > .bic-paper + .bic-paper { margin-top: 24px; }
+/* contact details beside the campus map (Bryanston campus page) */
+.bic-visit-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 24px 32px; align-items: start; margin-top: 10px; }
+.bic-visit .bic-contact-list { margin-top: 0; }
+.bic-visit-map > .bic-contact { margin-bottom: 12px; }
+.bic-visit-map .bic-embed { margin: 0; }
+@media (max-width: 760px) { .bic-visit-grid { grid-template-columns: 1fr; } }
+/* full-width contact panel below a two-column row */
+.bic-visit-wide { margin-top: 24px; }
+.bic-visit-wide .bic-visit-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+@media (max-width: 760px) { .bic-visit-wide .bic-visit-grid { grid-template-columns: 1fr; } }
+/* equal-height row with a two-panel aside: the last aside panel stretches to the bottom of the main column */
+@media (min-width: 993px) {
+  .bic-row-equal > .bic-aside { display: flex; flex-direction: column; }
+  .bic-row-equal > .bic-aside > .bic-paper { height: auto; }
+  .bic-row-equal > .bic-aside > .bic-paper:last-child { flex: 1 1 auto; }
+}
 /* "next step" band */
 .bic-cta-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; border-radius: var(--radius); padding: clamp(24px, 3.4vw, 40px);
   background: linear-gradient(115deg, var(--navy) 0%, var(--navy-2) 60%, var(--navy-3) 100%); color: #e3ebf5; box-shadow: var(--shadow); }
