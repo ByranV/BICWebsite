@@ -30,7 +30,7 @@
 }
 
 /* ---------- Base ---------- */
-html { scroll-behavior: smooth; scroll-padding-top: 130px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--hdr, 112px) + 64px); }
 body {
   font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--text); background: var(--bg); line-height: 1.65; font-size: 16px;
@@ -111,7 +111,14 @@ nav .bic-sub li.parent a { font-weight: 500; }
 .sidenav li.active > a:not(.collapsible-header) { color: var(--blue-dark); background: var(--blue-soft); }
 
 /* ---------- Page hero ---------- */
-.bic-hero { background: linear-gradient(115deg, var(--navy) 0%, var(--navy-2) 55%, #244a86 100%); color: #fff; padding: 30px 0 36px; }
+.bic-hero { position: relative; isolation: isolate; background: linear-gradient(115deg, var(--navy) 0%, var(--navy-2) 55%, #244a86 100%); background-size: cover; background-position: center; color: #fff; padding: clamp(32px, 4.5vw, 56px) 0 clamp(36px, 5vw, 62px); }
+/* section photo behind a navy overlay (same treatment as the home page hero) */
+.bic-hero-photo::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(100deg, rgba(14, 26, 44, .95) 0%, rgba(20, 35, 58, .88) 50%, rgba(20, 35, 58, .6) 100%); }
+.bic-hero-main { background-image: url(../img/BIC_Bryanston_1.jpg); }
+.bic-hero-bry { background-image: url(../img/BIC_Bryanston_2.jpg); }
+.bic-hero-dc { background-image: url(../img/20210107_112902-e1754035315332.jpg); }
+.bic-hero-pta { background-image: url(../img/PTA1.jpg); }
+.bic-hero-exam { background-image: url(../img/IMG_9317.jpg); background-position: center 30%; }
 .bic-hero h1 { margin: 0; font-size: clamp(1.7rem, 4.2vw, 2.6rem); font-weight: 500; line-height: 1.2; max-width: 26ch; }
 .bic-crumbs { margin: 0 0 10px; font-size: .85rem; color: #b9c8db; display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 .bic-crumbs a { color: inherit; }
@@ -126,6 +133,8 @@ nav .bic-sub li.parent a { font-weight: 500; }
 
 /* ---------- Section tabs ---------- */
 .bic-tabs { background: #fff; border-bottom: 1px solid var(--line); }
+/* tabs stay in view under the sticky header (--hdr is set from the header's height by site.js) */
+@media (min-width: 601px) { .bic-tabs { position: sticky; top: var(--hdr, 112px); z-index: 980; box-shadow: 0 4px 12px rgba(20, 35, 58, .06); } }
 .bic-tabs ul { margin: 0; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
 .bic-tabs li { flex: 0 0 auto; }
 .bic-tabs a { display: block; padding: 14px 14px 11px; font-size: .92rem; font-weight: 500; color: var(--muted); white-space: nowrap; border-bottom: 3px solid transparent; }
@@ -144,7 +153,7 @@ nav .bic-sub li.parent a { font-weight: 500; }
 .bic-row-top > .col:last-child { margin-bottom: 0; }
 .bic-row-inner { display: flex; flex-wrap: wrap; align-items: center; margin: 0 -.75rem 1.25rem; }
 .bic-row-inner > .col { margin-left: 0; }
-@media (min-width: 993px) { .bic-aside { position: sticky; top: 136px; } }
+@media (min-width: 993px) { .bic-aside { position: sticky; top: calc(var(--hdr, 112px) + 72px); } }
 /* Opt-in: on desktop, stretch both columns to the same height (main column and aside) */
 @media (min-width: 993px) {
   .bic-row-equal { align-items: stretch; }
@@ -205,13 +214,22 @@ h6.bic-h + .bic-h { margin-top: 0; }
 .bic-img-link:hover .bic-img-cta, .bic-img-link:focus-visible .bic-img-cta { opacity: 1; transform: none; }
 @media (hover: none) { .bic-img-cta { position: static; display: block; opacity: 1; transform: none; } }
 
-.btn, .btn-large, .btn:focus, .btn-large:focus { background-color: var(--blue); border-radius: 999px; text-transform: none; font-weight: 500; letter-spacing: .01em; box-shadow: 0 2px 6px rgba(40, 114, 250, .3); }
-.btn:hover, .btn-large:hover { background-color: var(--blue-dark); }
-.btn-large { height: auto; min-height: 50px; line-height: 1.3; padding: 13px 26px; display: inline-flex; align-items: center; font-size: 1rem; text-align: left; }
-.btn-large i.left, .btn i.left { margin-right: 10px; }
-.btn-large i.right { margin-left: 10px; }
-.btn-large i { line-height: 1; font-size: 1.3rem; }
-.btn-flat { color: var(--blue-dark); text-transform: none; font-weight: 500; border-radius: 999px; }
+/* Buttons: one system site-wide, matching the home page.
+   .btn / .btn-large = main action (solid blue pill); .btn-flat = second action (outlined pill). */
+.btn, .btn-large, .btn-flat {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: auto; min-height: 44px; padding: 10px 24px;
+  line-height: 1.3; border-radius: 999px; text-transform: none; font-weight: 500; font-size: .98rem; letter-spacing: .01em; text-align: center;
+  transition: background-color .18s, box-shadow .18s, transform .18s, color .18s;
+}
+.btn, .btn-large, .btn:focus, .btn-large:focus { background-color: var(--blue); color: #fff; box-shadow: 0 2px 6px rgba(40, 114, 250, .3); }
+.btn:hover, .btn-large:hover { background-color: var(--blue-dark); box-shadow: 0 6px 16px rgba(40, 114, 250, .32); transform: translateY(-1px); }
+.btn-large { min-height: 50px; padding: 13px 28px; font-size: 1rem; }
+.btn-flat, .btn-flat:focus { background-color: transparent; color: var(--blue-dark); box-shadow: inset 0 0 0 1.5px var(--blue); }
+.btn-flat:hover { background-color: var(--blue-soft); color: var(--blue-dark); transform: translateY(-1px); }
+.btn i, .btn-large i, .btn-flat i, .btn i.left, .btn i.right, .btn-large i.left, .btn-large i.right, .btn-flat i.left, .btn-flat i.right { float: none; margin: 0; line-height: 1; height: auto; font-size: 1.2rem; }
+/* one size per context: content rows use the standard size, call-to-action bands the large size */
+.bic-btn-row .btn-large, .bic-pdf-actions .btn-large { min-height: 44px; padding: 10px 24px; font-size: .98rem; }
+.bic-cta-actions .btn, .bic-cta-actions .btn-flat { min-height: 50px; padding: 13px 28px; font-size: 1rem; }
 .bic-btn-row { margin: 1.25rem 0; display: flex; flex-wrap: wrap; gap: 12px; }
 .bic-btn-row + .bic-btn-row { margin-top: -.25rem; }
 .bic-home-hero .btn-large { background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .7); backdrop-filter: blur(3px); }
@@ -406,7 +424,8 @@ figure.bic-quote { width: 100%; margin: 0; display: flex; flex-direction: column
 .bic-btn-ghost:hover { background: rgba(255, 255, 255, .22) !important; }
 .bic-cta-band.bic-cta-light { background: #fff; color: var(--text); border-left: 6px solid var(--blue); }
 .bic-cta-light .bic-h { color: var(--ink); }
-.bic-cta-light .btn i { vertical-align: middle; font-size: 1.1rem; margin-right: 4px; }
+.bic-cta-band:not(.bic-cta-light) .btn-flat { color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .7); }
+.bic-cta-band:not(.bic-cta-light) .btn-flat:hover { background-color: rgba(255, 255, 255, .15); }
 /* "why" mini features inside a paper */
 .bic-mini-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0 8px; }
 .bic-mini { display: flex; gap: 14px; padding: 16px 18px; border-radius: 12px; background: var(--bg); }
@@ -546,5 +565,47 @@ a.bic-more:hover { text-decoration: underline !important; }
 
 .bic-form + .bic-rich { margin-top: 1rem; }
 
+/* ---------- Engagement and wayfinding ---------- */
+/* cards lift gently on hover */
+.bic-mini, .bic-achievers li, .bic-path li, .bic-platform, .bic-cc, .bic-quick a, .bic-level { transition: transform .2s ease, box-shadow .2s ease; }
+.bic-mini:hover, .bic-achievers li:hover, .bic-path li:hover, .bic-platform:hover, .bic-quick a:hover, .bic-level:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(20, 35, 58, .08), 0 12px 26px rgba(20, 35, 58, .10); }
+.bic-cc:hover { box-shadow: 0 4px 10px rgba(20, 35, 58, .08), 0 14px 30px rgba(20, 35, 58, .12); }
+/* sections below the fold fade in as they scroll into view (added by site.js; skipped for reduced motion) */
+.bic-reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.bic-reveal.is-in { opacity: 1; transform: none; }
+/* quick links: icon tiles that take visitors straight to the key pages of a section */
+.bic-quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin: 0; padding: 0; }
+.bic-quick li { display: flex; }
+.bic-quick a { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 12px 16px; background: #fff; border-radius: 14px; box-shadow: var(--shadow); color: var(--ink); font-weight: 500; text-align: center; line-height: 1.3; }
+.bic-quick a:hover { color: var(--blue-dark); }
+.bic-quick i { width: 48px; height: 48px; border-radius: 12px; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; font-size: 26px; transition: background-color .2s, color .2s; }
+.bic-quick a:hover i { background: var(--blue); color: #fff; }
+.bic-paper .bic-quick a { background: var(--bg); box-shadow: none; }
+/* "On this page" jump links (built by site.js on long pages) */
+.bic-toc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.bic-toc-label { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-right: 4px; }
+.bic-toc a { display: inline-block; padding: 6px 14px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1px #cddbf3; color: var(--blue-dark); font-weight: 500; font-size: .92rem; transition: background-color .15s, color .15s; }
+.bic-toc a:hover { background: var(--blue); color: #fff; box-shadow: none; }
+/* back-to-top button (added by site.js) */
+.bic-top { position: fixed; right: 20px; bottom: 20px; z-index: 900; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--navy); color: #fff; cursor: pointer; display: grid; place-items: center;
+  box-shadow: 0 4px 14px rgba(10, 20, 35, .3); opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .2s, transform .2s, visibility .2s, background-color .15s; }
+.bic-top.is-on { opacity: 1; visibility: visible; transform: none; }
+.bic-top:hover { background: var(--blue); }
+/* expandable detail sections */
+.bic-acc { border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.bic-acc + .bic-acc { margin-top: 10px; }
+.bic-acc > summary { list-style: none; cursor: pointer; padding: 14px 18px; font-weight: 500; font-size: 1.05rem; color: var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 12px; border-radius: 12px; transition: color .15s, background-color .15s; }
+.bic-acc > summary::-webkit-details-marker { display: none; }
+.bic-acc > summary::after { content: "expand_more"; font-family: "Material Icons"; font-feature-settings: "liga"; font-weight: normal; font-size: 24px; line-height: 1; color: var(--blue-dark); transition: transform .2s; }
+.bic-acc[open] > summary::after { transform: rotate(180deg); }
+.bic-acc > summary:hover { color: var(--blue-dark); background: var(--blue-soft); }
+.bic-acc[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.bic-acc-body { padding: 4px 18px 16px; }
+.bic-acc-body > :last-child { margin-bottom: 0; }
+.bic-rich + .bic-acc, .bic-h + .bic-acc { margin-top: 14px; }
+.bic-acc + .bic-rich, .bic-acc + .bic-btn-row { margin-top: 18px; }
+@media print { .bic-top, .bic-toc { display: none !important; } .bic-reveal { opacity: 1; transform: none; } }
+
 /* spam honeypot on enquiry forms: hidden from people, visible to bots */
 .bic-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.bic-quick-404 { margin-top: 20px; }

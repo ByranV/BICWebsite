@@ -33,6 +33,11 @@
       list.scrollLeft = activeTab.offsetLeft - list.offsetLeft - 16;
     }
 
+    initHeaderOffset();
+    initToc();
+    initReveal();
+    initBackToTop();
+
     var forms = document.querySelectorAll('.bic-form');
     if (forms.length && CONFIG.formEndpoint && CONFIG.recaptchaSiteKey) {
       var s = document.createElement('script');
@@ -42,6 +47,84 @@
     }
     forms.forEach(initForm);
   });
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Expose the sticky header's height as --hdr so the section tabs, sticky asides
+  // and anchor jumps sit just below it at every screen size.
+  function initHeaderOffset() {
+    var header = document.querySelector('.bic-header');
+    if (!header) { return; }
+    function set() { document.documentElement.style.setProperty('--hdr', header.offsetHeight + 'px'); }
+    set();
+    window.addEventListener('resize', set);
+  }
+
+  function slug(text) {
+    return text.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  // "On this page" jump links on long pages: built from the main section headings
+  // when a page has five or more of them.
+  function initToc() {
+    var content = document.querySelector('.bic-content');
+    if (!content || document.body.hasAttribute('data-no-toc')) { return; }
+    var heads = Array.prototype.filter.call(content.querySelectorAll('h2.bic-h'), function (h) {
+      return !h.closest('.bic-cta-band, form, .bic-quick-wrap');
+    });
+    if (heads.length < 5) { return; }
+    // a div, not <nav>: Materialize styles every <nav> as the coloured top bar
+    var nav = document.createElement('div');
+    nav.className = 'bic-toc';
+    nav.setAttribute('role', 'navigation');
+    nav.setAttribute('aria-label', 'On this page');
+    nav.innerHTML = '<span class="bic-toc-label">On this page</span>';
+    heads.forEach(function (h) {
+      var host = h.closest('section') || h;
+      if (!host.id) { host.id = slug(h.textContent); }
+      var a = document.createElement('a');
+      a.href = '#' + host.id;
+      a.textContent = h.textContent;
+      nav.appendChild(a);
+    });
+    var section = document.createElement('section');
+    section.className = 'bic-section';
+    section.innerHTML = '<div class="container"></div>';
+    section.firstChild.appendChild(nav);
+    content.insertBefore(section, content.firstChild);
+  }
+
+  // Sections below the fold fade in as they scroll into view.
+  function initReveal() {
+    if (reduceMotion || !('IntersectionObserver' in window)) { return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.bic-content > .bic-section, .bic-content > .bic-band').forEach(function (el) {
+      if (el.getBoundingClientRect().top > window.innerHeight) {
+        el.classList.add('bic-reveal');
+        io.observe(el);
+      }
+    });
+  }
+
+  // Round "back to top" button, shown once the visitor has scrolled down a screen.
+  function initBackToTop() {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'bic-top';
+    btn.setAttribute('aria-label', 'Back to top');
+    btn.innerHTML = '<i class="material-icons" aria-hidden="true">arrow_upward</i>';
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+    document.body.appendChild(btn);
+    function toggle() { btn.classList.toggle('is-on', window.scrollY > window.innerHeight); }
+    window.addEventListener('scroll', toggle, { passive: true });
+    toggle();
+  }
 
   // Resolve with a reCAPTCHA v3 token, or '' if reCAPTCHA isn't configured or didn't load
   // (contact.php then rejects the submission and the visitor sees the email fallback message).
