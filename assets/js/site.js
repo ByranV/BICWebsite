@@ -1,4 +1,4 @@
-/* British International College — site behaviour (requires Materialize 1.0) */
+/* British International College — site behaviour (no framework needed) */
 (function () {
   'use strict';
 
@@ -14,26 +14,14 @@
     recaptchaSiteKey: '6LdlrqkrAAAAAGDZ3wLwBGtIAlNd1lU0ofqpmdgk'
   };
 
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   document.addEventListener('DOMContentLoaded', function () {
-    M.Sidenav.init(document.querySelectorAll('.sidenav'));
-    M.Collapsible.init(document.querySelectorAll('.collapsible'));
-    M.FormSelect.init(document.querySelectorAll('select'));
-    M.Materialbox.init(document.querySelectorAll('.materialboxed'));
-
-    document.querySelectorAll('.bic-slider-wrap').forEach(function (wrap) {
-      var slider = M.Slider.init(wrap.querySelector('.slider'), { indicators: true, interval: 5000, height: 400 });
-      wrap.querySelector('.bic-prev').addEventListener('click', function () { slider.prev(); });
-      wrap.querySelector('.bic-next').addEventListener('click', function () { slider.next(); });
-    });
-
-    // keep the current page visible in the horizontally scrolling section tabs
-    var activeTab = document.querySelector('.bic-tabs a.active');
-    if (activeTab) {
-      var list = activeTab.closest('ul');
-      list.scrollLeft = activeTab.offsetLeft - list.offsetLeft - 16;
-    }
-
-    initHeaderOffset();
+    initHeader();
+    initMenus();
+    initDrawer();
+    initSliders();
+    initTabs();
     initToc();
     initReveal();
     initBackToTop();
@@ -48,16 +36,167 @@
     forms.forEach(initForm);
   });
 
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Compact header: once the visitor scrolls down, the top bar slides away and the nav
+  // gets shorter (sizes live in site.css as --hdr). The header is fixed, so nothing below it moves.
+  function initHeader() {
+    var root = document.documentElement;
+    if (!document.querySelector('.bic-header')) { return; }
+    var compact = false;
+    function update() {
+      var want = window.scrollY > (compact ? 40 : 120);
+      if (want !== compact) {
+        compact = want;
+        root.classList.toggle('is-compact', compact);
+      }
+    }
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
 
-  // Expose the sticky header's height as --hdr so the section tabs, sticky asides
-  // and anchor jumps sit just below it at every screen size.
-  function initHeaderOffset() {
-    var header = document.querySelector('.bic-header');
-    if (!header) { return; }
-    function set() { document.documentElement.style.setProperty('--hdr', header.offsetHeight + 'px'); }
-    set();
-    window.addEventListener('resize', set);
+  // Desktop dropdowns: the section name is a link; the arrow button beside it opens the menu.
+  // Mouse users also get the menu on hover (site.css), touch and keyboard users use the button.
+  function initMenus() {
+    var items = document.querySelectorAll('.bic-has-sub');
+    if (!items.length) { return; }
+    function setOpen(li, on) {
+      li.classList.toggle('is-open', on);
+      li.querySelector('.bic-sub-toggle').setAttribute('aria-expanded', on ? 'true' : 'false');
+    }
+    function closeAll(except) {
+      items.forEach(function (li) { if (li !== except) { setOpen(li, false); } });
+    }
+    items.forEach(function (li) {
+      li.querySelector('.bic-sub-toggle').addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeAll(li);
+        setOpen(li, !li.classList.contains('is-open'));
+      });
+      li.addEventListener('focusout', function (e) {
+        if (!li.contains(e.relatedTarget)) { setOpen(li, false); }
+      });
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.bic-has-sub')) { closeAll(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      var open = document.querySelector('.bic-has-sub.is-open');
+      if (e.key === 'Escape' && open) {
+        setOpen(open, false);
+        open.querySelector('.bic-sub-toggle').focus();
+      }
+    });
+  }
+
+  // Mobile drawer with an accordion per section.
+  function initDrawer() {
+    var drawer = document.getElementById('mobile-nav');
+    var openBtn = document.querySelector('.bic-menu-btn');
+    if (!drawer || !openBtn) { return; }
+    var panel = drawer.querySelector('.bic-drawer-panel');
+    var lastFocus = null;
+
+    function open() {
+      lastFocus = document.activeElement;
+      drawer.classList.add('is-open');
+      openBtn.setAttribute('aria-expanded', 'true');
+      document.documentElement.classList.add('bic-noscroll');
+      setTimeout(function () { drawer.querySelector('.bic-drawer-close').focus(); }, 60);
+    }
+    function close() {
+      if (!drawer.classList.contains('is-open')) { return; }
+      drawer.classList.remove('is-open');
+      openBtn.setAttribute('aria-expanded', 'false');
+      document.documentElement.classList.remove('bic-noscroll');
+      if (lastFocus) { lastFocus.focus({ preventScroll: true }); }
+    }
+
+    openBtn.addEventListener('click', open);
+    drawer.querySelectorAll('[data-drawer-close]').forEach(function (el) { el.addEventListener('click', close); });
+    drawer.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab') { return; }
+      // keep keyboard focus inside the open drawer
+      var focusable = Array.prototype.filter.call(panel.querySelectorAll('a, button'), function (el) {
+        return el.offsetParent !== null;
+      });
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    window.addEventListener('resize', function () { if (window.innerWidth > 992) { close(); } });
+
+    drawer.querySelectorAll('.bic-side-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var sub = document.getElementById(btn.getAttribute('aria-controls'));
+        var on = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+        sub.hidden = !on;
+      });
+    });
+  }
+
+  // Photo sliders: cross-fade, arrows, dots, and auto-advance that pauses on hover or focus.
+  // Only the current slide and its neighbours are displayed, so the other photos load later.
+  function initSliders() {
+    document.querySelectorAll('.bic-slider-wrap').forEach(function (wrap) {
+      var slides = wrap.querySelectorAll('.slides > li');
+      if (!slides.length) { return; }
+      var index = 0;
+      var timer = null;
+      var dots = document.createElement('div');
+      dots.className = 'bic-dots';
+      slides.forEach(function (li, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Show photo ' + (i + 1) + ' of ' + slides.length);
+        b.addEventListener('click', function () { show(i); restart(); });
+        dots.appendChild(b);
+      });
+      wrap.appendChild(dots);
+
+      function show(i) {
+        index = (i + slides.length) % slides.length;
+        var prev = (index - 1 + slides.length) % slides.length;
+        var next = (index + 1) % slides.length;
+        slides.forEach(function (li, n) {
+          li.classList.toggle('is-active', n === index);
+          li.classList.toggle('is-near', n === prev || n === next);
+          li.setAttribute('aria-hidden', n === index ? 'false' : 'true');
+          dots.children[n].setAttribute('aria-current', n === index ? 'true' : 'false');
+        });
+      }
+      function restart() {
+        clearInterval(timer);
+        if (!reduceMotion && slides.length > 1) { timer = setInterval(function () { show(index + 1); }, 5000); }
+      }
+      wrap.querySelector('.bic-prev').addEventListener('click', function () { show(index - 1); restart(); });
+      wrap.querySelector('.bic-next').addEventListener('click', function () { show(index + 1); restart(); });
+      wrap.addEventListener('mouseenter', function () { clearInterval(timer); });
+      wrap.addEventListener('mouseleave', restart);
+      wrap.addEventListener('focusin', function () { clearInterval(timer); });
+      wrap.addEventListener('focusout', function (e) { if (!wrap.contains(e.relatedTarget)) { restart(); } });
+      wrap.classList.add('is-ready');
+      show(0);
+      restart();
+    });
+  }
+
+  // Section tabs: bring the current page's tab into view, and fade the edge that has more tabs beyond it.
+  function initTabs() {
+    document.querySelectorAll('.bic-tabs ul').forEach(function (list) {
+      var bar = list.closest('.bic-tabs');
+      var active = list.querySelector('a.active');
+      if (active) { list.scrollLeft = active.offsetLeft - list.offsetLeft - 16; }
+      function edges() {
+        var max = list.scrollWidth - list.clientWidth;
+        bar.classList.toggle('fade-l', list.scrollLeft > 4);
+        bar.classList.toggle('fade-r', list.scrollLeft < max - 4);
+      }
+      list.addEventListener('scroll', edges, { passive: true });
+      window.addEventListener('resize', edges);
+      edges();
+    });
   }
 
   function slug(text) {
@@ -94,9 +233,11 @@
     content.insertBefore(section, content.firstChild);
   }
 
-  // Sections below the fold fade in as they scroll into view.
+  // Sections below the fold fade in as they scroll into view. Jumping to an anchor
+  // shows everything at once, so the target is never blank when the visitor lands on it.
   function initReveal() {
-    if (reduceMotion || !('IntersectionObserver' in window)) { return; }
+    if (reduceMotion || !('IntersectionObserver' in window) || location.hash) { return; }
+    var root = document.documentElement;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
@@ -108,6 +249,15 @@
         io.observe(el);
       }
     });
+    function revealAll() {
+      root.classList.add('bic-reveal-skip');
+      document.querySelectorAll('.bic-reveal').forEach(function (el) { el.classList.add('is-in'); io.unobserve(el); });
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href*="#"]');
+      if (a && a.hash && a.pathname === location.pathname) { revealAll(); }
+    }, true);
+    window.addEventListener('hashchange', revealAll);
   }
 
   // Round "back to top" button, shown once the visitor has scrolled down a screen.
@@ -138,21 +288,9 @@
     });
   }
 
-  // The visible Materialize dropdown that stands in for a native <select>.
-  function selectInput(select) {
-    var wrap = select.closest('.select-wrapper');
-    return wrap ? wrap.querySelector('input.select-dropdown') : null;
-  }
-
-  // Rebuild a select's Materialize dropdown after its options or value change in code.
-  function refreshSelect(select) {
-    var inst = M.FormSelect.getInstance(select);
-    if (inst) { inst.destroy(); }
-    M.FormSelect.init(select);
-  }
-
   // "Level of Study" dropdown: list only the levels the chosen campus offers.
   // Each level <option> names its campuses in data-campuses (comma-separated).
+  // Returns a function that re-applies the filter (used after the form is reset).
   function initLevels(form) {
     var level = form.querySelector('select[data-level-select]');
     var campus = form.querySelector('select[name="Select Campus"]');
@@ -170,12 +308,16 @@
       });
       level.value = chosen;
       if (level.value !== chosen || !chosen) { placeholder.selected = true; }
-      refreshSelect(level);
     }
 
     campus.addEventListener('change', sync);
     sync();
-    return function () { refreshSelect(campus); sync(); };
+    return sync;
+  }
+
+  function markField(f, ok) {
+    f.classList.toggle('invalid', !ok);
+    if (ok) { f.removeAttribute('aria-invalid'); } else { f.setAttribute('aria-invalid', 'true'); }
   }
 
   function initForm(form) {
@@ -183,13 +325,12 @@
     var button = form.querySelector('[type=submit]');
     var buttonHtml = button.innerHTML;
     var sending = false;
-    var resetSelects = initLevels(form);
+    var resetLevels = initLevels(form);
 
-    // clear a dropdown's error highlight once the visitor picks a value
-    form.querySelectorAll('select').forEach(function (sel) {
-      sel.addEventListener('change', function () {
-        var input = selectInput(sel);
-        if (input && sel.checkValidity()) { input.classList.remove('invalid'); }
+    // clear a field's error highlight as soon as it becomes valid
+    form.querySelectorAll('input, select, textarea').forEach(function (f) {
+      ['input', 'change'].forEach(function (type) {
+        f.addEventListener(type, function () { if (f.classList.contains('invalid') && f.checkValidity()) { markField(f, true); } });
       });
     });
 
@@ -218,14 +359,8 @@
 
       fields.forEach(function (f) {
         var ok = f.checkValidity();
-        if (f.tagName === 'SELECT') {
-          var shown = selectInput(f);
-          if (shown) { shown.classList.toggle('invalid', !ok); }
-        } else if (f.type !== 'hidden') {
-          f.classList.toggle('invalid', !ok);
-          f.classList.toggle('valid', ok && f.value !== '');
-        }
-        if (!ok && !firstBad) { firstBad = f.tagName === 'SELECT' ? (selectInput(f) || f) : f; }
+        if (f.type !== 'hidden' && f.name !== '_hp') { markField(f, ok); }
+        if (!ok && !firstBad) { firstBad = f; }
         if (f.value) {
           lines.push(f.name + ': ' + f.value);
           data[f.name] = f.value;
@@ -255,7 +390,7 @@
         }).then(function (r) {
           if (!r.ok) { throw new Error(r.status); }
           form.reset();
-          resetSelects();
+          resetLevels();
           show('ok', 'Thank you. Your message has been sent.');
         }).catch(function () {
           show('err', 'Sorry, your message could not be sent. Please email ' + CONFIG.formEmail + '.');
