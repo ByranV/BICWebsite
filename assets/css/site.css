@@ -484,6 +484,10 @@ a.bic-contact:hover { background: var(--blue-soft); }
 .bic-merge-part .bic-rich h4.bic-h { margin: 22px 0 8px; font-size: 1.15rem; }
 .bic-merge-sub { margin: 0; color: var(--muted); }
 .bic-merge .bic-mini-grid { margin: 18px 0 0; }
+/* Academic Excellence: proof-point cards inside "Excellence you can see" (same inset style) */
+.bic-excel-cards { margin: 22px 0 0; }
+.bic-mini .bic-rich p { margin: 0 0 8px; font-size: .95rem; line-height: 1.5; }
+.bic-mini .bic-rich > :last-child { margin-bottom: 0; }
 .bic-mini-grid.bic-merge-4 { grid-template-columns: repeat(4, 1fr); }
 .bic-mini-grid.bic-merge-3 { grid-template-columns: repeat(3, 1fr); }
 .bic-merge-4 .bic-mini, .bic-merge-3 .bic-mini { flex-direction: column; gap: 10px; }
