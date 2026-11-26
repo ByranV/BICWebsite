@@ -609,3 +609,8 @@ a.bic-more:hover { text-decoration: underline !important; }
 /* spam honeypot on enquiry forms: hidden from people, visible to bots */
 .bic-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .bic-quick-404 { margin-top: 20px; }
+.bic-mini-grid.bic-mini-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 992px) { .bic-mini-grid.bic-mini-3 { grid-template-columns: 1fr; } }
+h3.bic-h.bic-venues-head { font-size: 1.05rem; margin: 22px 0 10px; }
+.bic-venues { margin-bottom: 0; }
+.bic-cta-band:not(.bic-cta-light) p a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
